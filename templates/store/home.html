@@ -1,463 +1,210 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>ShopEasy Garden | Plants & Gardening Essentials</title>
+    <title>ShopEasy Garden | Grow Your World</title>
 
-    <meta name="description"
-          content="Shop beautiful plants, seeds, planters and gardening essentials at ShopEasy Garden.">
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
     <style>
         :root {
-            --green: #287a46;
-            --dark: #123b24;
-            --dark-2: #0b2818;
-            --soft: #eef7ef;
-            --cream: #fafbf7;
-            --gold: #e4a23b;
-            --text: #24352a;
-            --muted: #718078;
-        }
-
-        * {
-            scroll-behavior: smooth;
+            --green: #198754;
+            --dark-green: #0d5c3a;
+            --light-green: #eef8f1;
+            --cream: #f8f6ef;
+            --dark: #17231d;
         }
 
         body {
-            margin: 0;
-            background: var(--cream);
-            color: var(--text);
-            font-family: Inter, Arial, sans-serif;
+            font-family: Arial, sans-serif;
+            color: var(--dark);
+            background: #fff;
         }
-
-        /* NAVBAR */
 
         .navbar {
-            background: rgba(255,255,255,.96);
-            backdrop-filter: blur(12px);
-            box-shadow: 0 3px 20px rgba(0,0,0,.06);
-            padding: 13px 0;
+            background: rgba(13, 92, 58, 0.98);
         }
 
-        .brand {
-            text-decoration: none;
-            color: var(--dark);
-            font-size: 26px;
-            font-weight: 900;
-            letter-spacing: -.7px;
-        }
-
-        .brand span {
-            color: var(--green);
+        .navbar-brand {
+            font-size: 1.55rem;
+            font-weight: 800;
+            letter-spacing: .3px;
         }
 
         .nav-link {
-            color: #34433a !important;
             font-weight: 600;
-            margin: 0 7px;
         }
-
-        .nav-link:hover {
-            color: var(--green) !important;
-        }
-
-        .search-wrap {
-            max-width: 410px;
-            width: 100%;
-        }
-
-        .search-box {
-            border: 1px solid #dce6dd;
-            border-radius: 50px;
-            padding: 11px 18px;
-            background: #f9fbf8;
-        }
-
-        .search-box:focus {
-            border-color: var(--green);
-            box-shadow: 0 0 0 3px rgba(40,122,70,.10);
-        }
-
-        .search-btn {
-            border: none;
-            border-radius: 50px;
-            background: var(--green);
-            color: white;
-            padding: 10px 18px;
-        }
-
-        .search-btn:hover {
-            background: var(--dark);
-        }
-
-        .icon-link {
-            font-size: 19px;
-        }
-
-        /* HERO */
 
         .hero {
-            min-height: 650px;
+            min-height: 620px;
             display: flex;
             align-items: center;
-            position: relative;
-            overflow: hidden;
-
             background:
-                radial-gradient(circle at 80% 20%, rgba(143,190,133,.35), transparent 30%),
-                linear-gradient(110deg, #09291a 0%, #16472b 50%, #376849 100%);
-        }
-
-        .hero::after {
-            content: "🌿";
-            position: absolute;
-            right: 5%;
-            bottom: -80px;
-            font-size: 330px;
-            opacity: .09;
-            transform: rotate(-15deg);
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            max-width: 700px;
+                linear-gradient(90deg, rgba(8, 48, 31, .93), rgba(8, 48, 31, .62), rgba(8, 48, 31, .18)),
+                url("https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=1800&q=85")
+                center/cover;
             color: white;
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 9px 17px;
-            border-radius: 50px;
-            background: rgba(255,255,255,.10);
-            border: 1px solid rgba(255,255,255,.18);
-            font-weight: 600;
-            margin-bottom: 22px;
         }
 
         .hero h1 {
-            font-size: clamp(42px, 6vw, 72px);
-            line-height: 1.04;
+            font-size: clamp(2.8rem, 6vw, 5.5rem);
             font-weight: 900;
-            letter-spacing: -2px;
-        }
-
-        .hero h1 span {
-            color: #9ed59e;
+            line-height: .98;
         }
 
         .hero p {
-            color: #d7e6da;
-            font-size: 18px;
-            line-height: 1.75;
-            max-width: 610px;
+            font-size: 1.15rem;
+            max-width: 600px;
+            color: #edf8f1;
         }
 
-        .hero-btn {
-            background: white;
-            color: var(--dark);
-            border-radius: 50px;
-            padding: 14px 25px;
-            font-weight: 800;
+        .btn-garden {
+            background: var(--green);
             border: none;
-        }
-
-        .hero-btn:hover {
-            background: #e9f5e9;
-            color: var(--dark);
-            transform: translateY(-2px);
-        }
-
-        .hero-outline {
             color: white;
-            border: 1px solid rgba(255,255,255,.55);
+            font-weight: 700;
+            padding: 13px 25px;
             border-radius: 50px;
-            padding: 13px 24px;
+        }
+
+        .btn-garden:hover {
+            background: #146c43;
+            color: white;
+        }
+
+        .btn-outline-light {
+            border-radius: 50px;
+            padding: 12px 24px;
             font-weight: 700;
         }
 
-        .hero-outline:hover {
-            background: white;
-            color: var(--dark);
-        }
-
-        /* TRUST BAR */
-
-        .trust-bar {
-            background: white;
-            box-shadow: 0 8px 30px rgba(0,0,0,.06);
-            position: relative;
-            z-index: 5;
-        }
-
-        .trust-item {
-            display: flex;
-            align-items: center;
-            gap: 13px;
-            padding: 18px 5px;
-        }
-
-        .trust-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--soft);
-            color: var(--green);
-            font-size: 21px;
-        }
-
-        .trust-item strong {
-            display: block;
-            font-size: 14px;
-        }
-
-        .trust-item small {
-            color: var(--muted);
-        }
-
-        /* SECTIONS */
-
-        .section-label {
-            color: var(--green);
-            font-weight: 800;
-            font-size: 13px;
-            letter-spacing: 1.4px;
-        }
-
         .section-title {
-            color: var(--dark);
             font-weight: 900;
-            font-size: 38px;
-            letter-spacing: -1px;
+            font-size: 2.3rem;
         }
-
-        .section-subtitle {
-            color: var(--muted);
-        }
-
-        /* CATEGORY */
 
         .category-card {
-            background: white;
+            border: none;
             border-radius: 22px;
-            padding: 30px 20px;
-            text-align: center;
-            height: 100%;
-            border: 1px solid #edf1ed;
+            overflow: hidden;
             transition: .3s;
+            box-shadow: 0 8px 25px rgba(0,0,0,.07);
+            height: 100%;
         }
 
         .category-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 18px 40px rgba(25,75,40,.12);
+            box-shadow: 0 15px 35px rgba(0,0,0,.12);
         }
 
         .category-icon {
-            width: 78px;
-            height: 78px;
-            margin: 0 auto 18px;
+            width: 75px;
+            height: 75px;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: var(--light-green);
+            color: var(--green);
             border-radius: 50%;
-            background: var(--soft);
-            font-size: 36px;
+            font-size: 2rem;
+            margin: 25px auto 15px;
         }
-
-        .category-card h5 {
-            color: var(--dark);
-            font-weight: 800;
-        }
-
-        /* PRODUCT */
 
         .product-card {
-            background: white;
-            border: 1px solid #edf0ed;
-            border-radius: 22px;
+            border: 0;
+            border-radius: 20px;
             overflow: hidden;
             height: 100%;
+            background: white;
+            box-shadow: 0 7px 25px rgba(0,0,0,.07);
             transition: .3s;
         }
 
         .product-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 45px rgba(20,60,30,.13);
+            transform: translateY(-7px);
+            box-shadow: 0 15px 35px rgba(0,0,0,.13);
         }
 
-        .product-image-wrap {
-            height: 250px;
-            background: var(--soft);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .product-image-wrap img {
+        .product-img {
+            height: 245px;
             width: 100%;
-            height: 100%;
             object-fit: cover;
-            transition: .5s;
-        }
-
-        .product-card:hover img {
-            transform: scale(1.06);
-        }
-
-        .product-placeholder {
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 75px;
-        }
-
-        .product-badge {
-            position: absolute;
-            top: 14px;
-            left: 14px;
-            background: white;
-            color: var(--green);
-            font-size: 11px;
-            font-weight: 800;
-            padding: 7px 11px;
-            border-radius: 50px;
-            box-shadow: 0 5px 15px rgba(0,0,0,.08);
+            background: #f2f5f2;
         }
 
         .product-body {
             padding: 20px;
         }
 
-        .category-name {
-            color: var(--green);
-            font-size: 12px;
+        .product-title {
             font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: .7px;
-        }
-
-        .product-name {
-            color: var(--text);
-            font-weight: 800;
-            margin-top: 6px;
-        }
-
-        .product-description {
-            color: var(--muted);
-            font-size: 14px;
-            min-height: 42px;
+            font-size: 1.15rem;
         }
 
         .price {
-            color: var(--dark);
-            font-size: 22px;
-            font-weight: 900;
-        }
-
-        .view-btn {
-            border: 1px solid var(--green);
             color: var(--green);
-            border-radius: 50px;
-            font-weight: 700;
-            padding: 8px 15px;
-        }
-
-        .view-btn:hover {
-            background: var(--green);
-            color: white;
-        }
-
-        /* PROMO */
-
-        .promo {
-            background:
-                radial-gradient(circle at 85% 20%, rgba(147,196,140,.25), transparent 25%),
-                var(--dark);
-            border-radius: 30px;
-            color: white;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .promo h2 {
+            font-size: 1.35rem;
             font-weight: 900;
-            font-size: 40px;
         }
 
-        .promo p {
-            color: #c8d9cb;
-            line-height: 1.7;
+        .stock-badge {
+            font-size: .75rem;
+            border-radius: 50px;
+            padding: 5px 9px;
         }
 
-        .promo-icon {
-            font-size: 125px;
-            opacity: .9;
-        }
-
-        /* WHY */
-
-        .why-section {
-            background: var(--soft);
-        }
-
-        .why-card {
+        .wishlist {
+            width: 40px;
+            height: 40px;
+            border: none;
             background: white;
-            border-radius: 22px;
-            padding: 28px;
-            height: 100%;
-            border: 1px solid #e7efe7;
-        }
-
-        .why-icon {
-            width: 55px;
-            height: 55px;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(0,0,0,.12);
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 16px;
-            background: var(--soft);
+            color: #777;
+        }
+
+        .wishlist:hover {
+            color: #dc3545;
+        }
+
+        .feature-box {
+            padding: 30px 20px;
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 8px 25px rgba(0,0,0,.06);
+            height: 100%;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
             color: var(--green);
-            font-size: 25px;
-            margin-bottom: 18px;
         }
 
-        .why-card h5 {
-            font-weight: 800;
-            color: var(--dark);
+        .promo {
+            border-radius: 30px;
+            padding: 60px;
+            background:
+                linear-gradient(100deg, rgba(13,92,58,.95), rgba(25,135,84,.78)),
+                url("https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=1600&q=85")
+                center/cover;
+            color: white;
         }
-
-        .why-card p {
-            color: var(--muted);
-            line-height: 1.6;
-        }
-
-        /* FOOTER */
 
         footer {
-            background: var(--dark-2);
-            color: #b9cbbb;
-        }
-
-        footer h5 {
-            color: white;
-            font-weight: 800;
+            background: #10251c;
+            color: #d8e5dd;
         }
 
         footer a {
-            color: #b9cbbb;
+            color: #d8e5dd;
             text-decoration: none;
         }
 
@@ -465,54 +212,34 @@
             color: white;
         }
 
-        .footer-brand {
-            color: white;
-            font-size: 25px;
-            font-weight: 900;
+        .search-box {
+            border-radius: 50px;
+            overflow: hidden;
         }
 
-        .social {
-            width: 40px;
-            height: 40px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background: rgba(255,255,255,.08);
-            color: white;
-            margin-right: 7px;
+        .search-box input {
+            border: none;
+            padding: 12px 18px;
         }
 
-        .social:hover {
-            background: var(--green);
-            color: white;
+        .search-box button {
+            border: none;
+            background: white;
+            padding: 0 18px;
+            color: var(--green);
         }
 
-        @media(max-width: 768px) {
-
+        @media (max-width: 768px) {
             .hero {
-                min-height: 570px;
+                min-height: 560px;
             }
 
-            .hero h1 {
-                letter-spacing: -1px;
+            .promo {
+                padding: 35px 25px;
             }
 
-            .hero::after {
-                font-size: 200px;
-            }
-
-            .section-title {
-                font-size: 31px;
-            }
-
-            .search-wrap {
-                max-width: 100%;
-                margin: 15px 0;
-            }
-
-            .trust-item {
-                padding: 10px;
+            .product-img {
+                height: 220px;
             }
         }
     </style>
@@ -521,234 +248,179 @@
 <body>
 
 <!-- NAVBAR -->
-
-<nav class="navbar navbar-expand-lg sticky-top">
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-sm">
     <div class="container">
 
-        <a href="/" class="brand">
-            🌿 Shop<span>Easy</span>
+        <a class="navbar-brand" href="/">
+            <i class="bi bi-flower1 me-2"></i>ShopEasy Garden
         </a>
 
-        <button class="navbar-toggler"
-                type="button"
+        <button class="navbar-toggler" type="button"
                 data-bs-toggle="collapse"
-                data-bs-target="#navbar">
+                data-bs-target="#mainNav">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="navbar">
+        <div class="collapse navbar-collapse" id="mainNav">
 
-            <form class="d-flex mx-lg-auto search-wrap">
-                <input class="form-control search-box"
-                       type="search"
-                       placeholder="Search plants, seeds, pots...">
-
-                <button class="search-btn ms-2" type="submit">
-                    <i class="bi bi-search"></i>
-                </button>
-            </form>
-
-            <ul class="navbar-nav align-items-lg-center">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
 
                 <li class="nav-item">
-                    <a class="nav-link" href="/">
-                        Home
-                    </a>
+                    <a class="nav-link active" href="/">Home</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#categories">
-                        Categories
-                    </a>
+                    <a class="nav-link" href="#categories">Categories</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#products">
-                        Products
-                    </a>
+                    <a class="nav-link" href="#products">Products</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link icon-link" href="/admin/">
-                        <i class="bi bi-person-circle"></i>
-                    </a>
+                    <a class="nav-link" href="#why-us">Why Us</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link icon-link" href="#products">
-                        <i class="bi bi-bag"></i>
+                    <a class="nav-link" href="/admin/login/">
+                        <i class="bi bi-person-circle"></i> Account
                     </a>
                 </li>
 
             </ul>
+
+            <form class="d-flex ms-lg-3 mt-3 mt-lg-0 search-box"
+                  method="GET"
+                  action="/">
+                <input
+                    type="search"
+                    name="q"
+                    class="form-control"
+                    placeholder="Search plants..."
+                    aria-label="Search">
+                <button type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+
         </div>
     </div>
 </nav>
 
 
 <!-- HERO -->
-
 <section class="hero">
-
     <div class="container">
-        <div class="hero-content">
+        <div class="row">
+            <div class="col-lg-8">
 
-            <div class="hero-badge">
-                <span>🌱</span>
-                Grow Something Beautiful
-            </div>
+                <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill mb-4">
+                    🌿 Fresh. Natural. Beautiful.
+                </span>
 
-            <h1>
-                Bring a little<br>
-                <span>nature</span> home.
-            </h1>
+                <h1>
+                    Bring Nature<br>
+                    Into Your Home.
+                </h1>
 
-            <p>
-                Discover beautiful indoor plants, unique greenery,
-                quality seeds and stylish planters for your perfect
-                garden space.
-            </p>
+                <p class="mt-4 mb-4">
+                    Discover beautiful plants, gardening essentials and
+                    everything you need to create your own green paradise.
+                </p>
 
-            <div class="mt-4">
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="#products" class="btn btn-garden">
+                        Shop Now <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
 
-                <a href="#products" class="btn hero-btn">
-                    Shop Plants
-                    <i class="bi bi-arrow-right ms-2"></i>
-                </a>
-
-                <a href="#categories"
-                   class="btn hero-outline ms-md-2">
-                    Explore Categories
-                </a>
+                    <a href="#categories" class="btn btn-outline-light">
+                        Explore Categories
+                    </a>
+                </div>
 
             </div>
-
         </div>
     </div>
-
 </section>
 
 
-<!-- TRUST -->
-
-<section class="trust-bar">
+<!-- FEATURES STRIP -->
+<section class="py-4 bg-light">
     <div class="container">
+        <div class="row g-3 text-center">
 
-        <div class="row">
-
-            <div class="col-md-3 col-6">
-                <div class="trust-item">
-                    <div class="trust-icon">
-                        <i class="bi bi-leaf"></i>
-                    </div>
-                    <div>
-                        <strong>Healthy Plants</strong>
-                        <small>Carefully selected</small>
-                    </div>
-                </div>
+            <div class="col-md-4">
+                <strong>
+                    <i class="bi bi-truck text-success me-2"></i>
+                    Fast & Safe Delivery
+                </strong>
             </div>
 
-            <div class="col-md-3 col-6">
-                <div class="trust-item">
-                    <div class="trust-icon">
-                        <i class="bi bi-box-seam"></i>
-                    </div>
-                    <div>
-                        <strong>Safe Packaging</strong>
-                        <small>Carefully packed</small>
-                    </div>
-                </div>
+            <div class="col-md-4">
+                <strong>
+                    <i class="bi bi-shield-check text-success me-2"></i>
+                    Secure Shopping
+                </strong>
             </div>
 
-            <div class="col-md-3 col-6">
-                <div class="trust-item">
-                    <div class="trust-icon">
-                        <i class="bi bi-truck"></i>
-                    </div>
-                    <div>
-                        <strong>Easy Delivery</strong>
-                        <small>To your doorstep</small>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3 col-6">
-                <div class="trust-item">
-                    <div class="trust-icon">
-                        <i class="bi bi-heart"></i>
-                    </div>
-                    <div>
-                        <strong>Plant Support</strong>
-                        <small>We're here to help</small>
-                    </div>
-                </div>
+            <div class="col-md-4">
+                <strong>
+                    <i class="bi bi-patch-check text-success me-2"></i>
+                    Quality Products
+                </strong>
             </div>
 
         </div>
-
     </div>
 </section>
 
 
 <!-- CATEGORIES -->
-
-<section class="py-5" id="categories">
-
+<section id="categories" class="py-5">
     <div class="container py-4">
 
         <div class="text-center mb-5">
-            <div class="section-label">EXPLORE COLLECTION</div>
-
-            <h2 class="section-title mt-2">
-                Shop by Category
-            </h2>
-
-            <p class="section-subtitle">
-                Everything you need to build your own little garden.
+            <span class="text-success fw-bold">SHOP BY CATEGORY</span>
+            <h2 class="section-title mt-2">Find Your Green Match</h2>
+            <p class="text-muted">
+                Everything you need to make your space greener.
             </p>
         </div>
 
         <div class="row g-4">
 
-            <div class="col-lg-3 col-md-6">
-                <div class="category-card">
-                    <div class="category-icon">🪴</div>
-                    <h5>Indoor Plants</h5>
-                    <p class="text-muted mb-0">
-                        Bring fresh greenery indoors.
-                    </p>
+            {% for category in categories %}
+            <div class="col-6 col-lg-3">
+
+                <div class="category-card text-center">
+                    <div class="category-icon">
+                        {% if forloop.counter == 1 %}
+                            <i class="bi bi-flower1"></i>
+                        {% elif forloop.counter == 2 %}
+                            <i class="bi bi-tree"></i>
+                        {% elif forloop.counter == 3 %}
+                            <i class="bi bi-droplet"></i>
+                        {% else %}
+                            <i class="bi bi-basket"></i>
+                        {% endif %}
+                    </div>
+
+                    <div class="p-3 pb-4">
+                        <h5 class="fw-bold">{{ category.name }}</h5>
+                        <span class="text-success small">
+                            Explore collection →
+                        </span>
+                    </div>
                 </div>
+
+            </div>
+            {% empty %}
+
+            <div class="col-12 text-center">
+                <p class="text-muted">Categories coming soon.</p>
             </div>
 
-            <div class="col-lg-3 col-md-6">
-                <div class="category-card">
-                    <div class="category-icon">🌿</div>
-                    <h5>Rare Plants</h5>
-                    <p class="text-muted mb-0">
-                        Unique plants for collectors.
-                    </p>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-md-6">
-                <div class="category-card">
-                    <div class="category-icon">🌱</div>
-                    <h5>Seeds</h5>
-                    <p class="text-muted mb-0">
-                        Start growing from scratch.
-                    </p>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-md-6">
-                <div class="category-card">
-                    <div class="category-icon">🏺</div>
-                    <h5>Planters</h5>
-                    <p class="text-muted mb-0">
-                        Beautiful pots for every space.
-                    </p>
-                </div>
-            </div>
+            {% endfor %}
 
         </div>
     </div>
@@ -756,28 +428,23 @@
 
 
 <!-- PRODUCTS -->
-
-<section class="py-5" id="products">
-
+<section id="products" class="py-5 bg-light">
     <div class="container py-4">
 
-        <div class="d-flex justify-content-between align-items-end mb-5">
+        <div class="d-flex flex-column flex-md-row
+                    justify-content-between align-items-md-end mb-5">
 
             <div>
-                <div class="section-label">OUR COLLECTION</div>
-
-                <h2 class="section-title mt-2 mb-1">
-                    Featured Products
-                </h2>
-
-                <p class="section-subtitle mb-0">
-                    Handpicked greenery for your home.
+                <span class="text-success fw-bold">OUR COLLECTION</span>
+                <h2 class="section-title mt-2 mb-1">Featured Products</h2>
+                <p class="text-muted mb-0">
+                    Hand-picked products for your garden.
                 </p>
             </div>
 
-            <span class="badge rounded-pill bg-success px-3 py-2">
-                {{ products|length }} Products
-            </span>
+            <a href="#products" class="btn btn-outline-success rounded-pill mt-3 mt-md-0">
+                View All
+            </a>
 
         </div>
 
@@ -786,66 +453,74 @@
 
             {% for product in products %}
 
-            <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
 
-                <div class="product-card">
+                <div class="product-card position-relative">
 
-                    <div class="product-image-wrap">
-
-                        <span class="product-badge">
-                            <i class="bi bi-stars"></i>
-                            Featured
+                    {% if product.stock > 0 %}
+                        <span class="badge bg-success position-absolute top-0 start-0 m-3 stock-badge">
+                            In Stock
                         </span>
+                    {% else %}
+                        <span class="badge bg-danger position-absolute top-0 start-0 m-3 stock-badge">
+                            Out of Stock
+                        </span>
+                    {% endif %}
 
-                        {% if product.image %}
+                    <button class="wishlist position-absolute top-0 end-0 m-3"
+                            type="button"
+                            aria-label="Wishlist">
+                        <i class="bi bi-heart"></i>
+                    </button>
 
-                            <img src="{{ product.image.url }}"
-                                 alt="{{ product.name }}">
 
-                        {% else %}
-
-                            <div class="product-placeholder">
-                                🌿
-                            </div>
-
-                        {% endif %}
-
-                    </div>
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}"
+                             class="product-img"
+                             alt="{{ product.name }}">
+                    {% else %}
+                        <div class="product-img d-flex align-items-center justify-content-center">
+                            <i class="bi bi-flower1 text-success fs-1"></i>
+                        </div>
+                    {% endif %}
 
 
                     <div class="product-body">
 
-                        <div class="category-name">
+                        <small class="text-success fw-semibold">
                             {{ product.category.name }}
-                        </div>
+                        </small>
 
-                        <h5 class="product-name">
+                        <h5 class="product-title mt-2 mb-2">
                             {{ product.name }}
                         </h5>
 
-                        <p class="product-description">
-                            {{ product.description|truncatewords:11 }}
+                        <p class="text-muted small mb-3">
+                            {{ product.description|truncatewords:12 }}
                         </p>
 
-                        <div class="d-flex
-                                    justify-content-between
-                                    align-items-center
-                                    mt-3">
+                        <div class="d-flex justify-content-between
+                                    align-items-center">
 
-                            <div class="price">
+                            <span class="price">
                                 ₹{{ product.price }}
-                            </div>
+                            </span>
 
-                            <a href="{% url 'product_detail' product.slug %}"
-                               class="btn view-btn">
-                                View
-                                <i class="bi bi-arrow-right ms-1"></i>
-                            </a>
+                            {% if product.stock > 0 %}
+                                <a href="{% url 'product_detail' product.slug %}"
+                                   class="btn btn-success rounded-pill px-3">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            {% else %}
+                                <button class="btn btn-secondary rounded-pill px-3"
+                                        disabled>
+                                    Sold Out
+                                </button>
+                            {% endif %}
 
                         </div>
 
                     </div>
-
                 </div>
 
             </div>
@@ -853,75 +528,65 @@
             {% empty %}
 
             <div class="col-12">
+                <div class="text-center bg-white rounded-4 p-5 shadow-sm">
 
-                <div class="text-center py-5">
+                    <i class="bi bi-box-seam text-success"
+                       style="font-size:4rem;"></i>
 
-                    <div style="font-size:75px;">🌱</div>
-
-                    <h3 class="fw-bold mt-3">
-                        Your garden is waiting!
-                    </h3>
+                    <h3 class="mt-3">No Products Yet</h3>
 
                     <p class="text-muted">
-                        Add products from Django Admin.
+                        Add your first product from the admin panel.
                     </p>
 
-                    <a href="/admin/"
-                       class="btn btn-success rounded-pill px-4">
-                        Open Admin
+                    <a href="/admin/" class="btn btn-garden">
+                        Open Admin Panel
                     </a>
 
                 </div>
-
             </div>
 
             {% endfor %}
 
         </div>
-
     </div>
 </section>
 
 
 <!-- PROMO -->
-
 <section class="py-5">
+    <div class="container py-3">
 
-    <div class="container">
-
-        <div class="promo p-4 p-md-5">
+        <div class="promo">
 
             <div class="row align-items-center">
 
-                <div class="col-md-8">
+                <div class="col-lg-8">
 
-                    <div class="section-label"
-                         style="color:#9ed59e;">
-                        🌿 PLANT CARE
-                    </div>
+                    <span class="badge bg-light text-success rounded-pill px-3 py-2 mb-3">
+                        🌱 GROW SOMETHING BEAUTIFUL
+                    </span>
 
-                    <h2 class="mt-2">
-                        Make your space<br>
-                        greener & happier.
+                    <h2 class="display-5 fw-bold">
+                        Your garden deserves a little love.
                     </h2>
 
-                    <p class="mt-3">
-                        Whether you're a beginner or a plant lover,
-                        discover the right greenery for your lifestyle.
+                    <p class="lead mb-0">
+                        Start small, grow naturally and create a space
+                        you'll love every day.
                     </p>
-
-                    <a href="#products"
-                       class="btn hero-btn mt-2">
-                        Discover Plants
-                        <i class="bi bi-arrow-right ms-2"></i>
-                    </a>
 
                 </div>
 
-                <div class="col-md-4 text-center">
-                    <div class="promo-icon">
-                        🪴
-                    </div>
+                <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+
+                    <a href="#products"
+                       class="btn btn-light text-success
+                              rounded-pill fw-bold px-4 py-3">
+                        Start Shopping
+                        <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+
                 </div>
 
             </div>
@@ -929,101 +594,121 @@
         </div>
 
     </div>
-
 </section>
 
 
-<!-- WHY -->
-
-<section class="why-section py-5">
-
+<!-- WHY US -->
+<section id="why-us" class="py-5 bg-light">
     <div class="container py-4">
 
         <div class="text-center mb-5">
 
-            <div class="section-label">
-                WHY SHOPEASY?
-            </div>
+            <span class="text-success fw-bold">WHY SHOP WITH US</span>
 
             <h2 class="section-title mt-2">
-                Gardening Made Simple
+                Made For Plant Lovers
             </h2>
+
+            <p class="text-muted">
+                We make your gardening journey simple and enjoyable.
+            </p>
 
         </div>
 
+
         <div class="row g-4">
 
-            <div class="col-md-3">
+            <div class="col-md-4">
+                <div class="feature-box text-center">
 
-                <div class="why-card">
+                    <i class="bi bi-truck feature-icon"></i>
 
-                    <div class="why-icon">
-                        <i class="bi bi-flower1"></i>
-                    </div>
+                    <h4 class="fw-bold mt-3">
+                        Fast Delivery
+                    </h4>
 
-                    <h5>Healthy Plants</h5>
-
-                    <p>
-                        We focus on quality greenery ready
-                        for your home.
+                    <p class="text-muted mb-0">
+                        Get your gardening essentials delivered safely
+                        and quickly.
                     </p>
 
                 </div>
-
             </div>
 
-            <div class="col-md-3">
 
-                <div class="why-card">
+            <div class="col-md-4">
+                <div class="feature-box text-center">
 
-                    <div class="why-icon">
-                        <i class="bi bi-box-seam"></i>
-                    </div>
+                    <i class="bi bi-shield-check feature-icon"></i>
 
-                    <h5>Secure Packaging</h5>
+                    <h4 class="fw-bold mt-3">
+                        Secure Shopping
+                    </h4>
 
-                    <p>
-                        Products are carefully prepared
-                        for delivery.
+                    <p class="text-muted mb-0">
+                        Your shopping experience is designed to be
+                        simple and secure.
                     </p>
 
                 </div>
-
             </div>
 
-            <div class="col-md-3">
 
-                <div class="why-card">
+            <div class="col-md-4">
+                <div class="feature-box text-center">
 
-                    <div class="why-icon">
-                        <i class="bi bi-globe2"></i>
-                    </div>
+                    <i class="bi bi-heart feature-icon"></i>
 
-                    <h5>Eco Friendly</h5>
+                    <h4 class="fw-bold mt-3">
+                        Quality First
+                    </h4>
 
-                    <p>
-                        Better choices for your plants
-                        and our planet.
+                    <p class="text-muted mb-0">
+                        Carefully selected products for your green space.
                     </p>
 
                 </div>
-
             </div>
 
-            <div class="col-md-3">
+        </div>
 
-                <div class="why-card">
+    </div>
+</section>
 
-                    <div class="why-icon">
-                        <i class="bi bi-chat-heart"></i>
-                    </div>
 
-                    <h5>Plant Support</h5>
+<!-- NEWSLETTER -->
+<section class="py-5">
+    <div class="container">
 
-                    <p>
-                        Helpful guidance to keep your
-                        plants happy.
-                    </p>
+        <div class="text-center">
+
+            <i class="bi bi-envelope-paper-heart text-success"
+               style="font-size:3rem;"></i>
+
+            <h2 class="fw-bold mt-3">
+                Stay In The Green Loop 🌿
+            </h2>
+
+            <p class="text-muted">
+                Get gardening tips, new products and special offers.
+            </p>
+
+            <div class="row justify-content-center mt-4">
+
+                <div class="col-md-6">
+
+                    <form class="input-group">
+
+                        <input type="email"
+                               class="form-control rounded-start-pill"
+                               placeholder="Enter your email">
+
+                        <button class="btn btn-success rounded-end-pill px-4"
+                                type="button">
+                            Subscribe
+                        </button>
+
+                    </form>
 
                 </div>
 
@@ -1036,94 +721,128 @@
 
 
 <!-- FOOTER -->
-
 <footer class="pt-5 pb-4">
 
     <div class="container">
 
-        <div class="row g-5">
+        <div class="row g-4">
 
             <div class="col-lg-4">
 
-                <div class="footer-brand">
-                    🌿 ShopEasy
-                </div>
+                <h4 class="fw-bold text-white">
+                    <i class="bi bi-flower1 me-2"></i>
+                    ShopEasy Garden
+                </h4>
 
                 <p class="mt-3">
-                    Your little corner of nature.
-                    Discover plants, seeds and gardening
-                    essentials for your home.
+                    Bringing nature closer to your home with beautiful
+                    plants and gardening essentials.
                 </p>
 
-                <div class="mt-4">
+                <div class="d-flex gap-3 fs-4">
 
-                    <a href="#" class="social">
+                    <a href="#">
                         <i class="bi bi-instagram"></i>
                     </a>
 
-                    <a href="#" class="social">
+                    <a href="#">
                         <i class="bi bi-facebook"></i>
                     </a>
 
-                    <a href="#" class="social">
-                        <i class="bi bi-youtube"></i>
+                    <a href="#">
+                        <i class="bi bi-twitter-x"></i>
                     </a>
 
                 </div>
 
             </div>
 
+
             <div class="col-6 col-lg-2">
 
-                <h5>Shop</h5>
+                <h6 class="text-white fw-bold">
+                    Quick Links
+                </h6>
 
-                <p class="mt-3"><a href="#products">Plants</a></p>
-                <p><a href="#products">Seeds</a></p>
-                <p><a href="#products">Planters</a></p>
+                <ul class="list-unstyled mt-3">
+
+                    <li class="mb-2">
+                        <a href="/">Home</a>
+                    </li>
+
+                    <li class="mb-2">
+                        <a href="#categories">Categories</a>
+                    </li>
+
+                    <li class="mb-2">
+                        <a href="#products">Products</a>
+                    </li>
+
+                    <li>
+                        <a href="#why-us">Why Us</a>
+                    </li>
+
+                </ul>
 
             </div>
+
 
             <div class="col-6 col-lg-3">
 
-                <h5>Customer Care</h5>
+                <h6 class="text-white fw-bold">
+                    Customer Support
+                </h6>
 
-                <p class="mt-3"><a href="#">Contact Us</a></p>
-                <p><a href="#">Plant Care</a></p>
-                <p><a href="#">Shipping</a></p>
-                <p><a href="#">Returns</a></p>
+                <ul class="list-unstyled mt-3">
+
+                    <li class="mb-2">
+                        <i class="bi bi-envelope me-2"></i>
+                        support@shopeasy.com
+                    </li>
+
+                    <li class="mb-2">
+                        <i class="bi bi-telephone me-2"></i>
+                        +91 98765 43210
+                    </li>
+
+                    <li>
+                        <i class="bi bi-clock me-2"></i>
+                        Mon - Sat
+                    </li>
+
+                </ul>
 
             </div>
+
 
             <div class="col-lg-3">
 
-                <h5>Admin</h5>
+                <h6 class="text-white fw-bold">
+                    Our Promise
+                </h6>
 
                 <p class="mt-3">
-                    Manage products and your store
-                    through the Django admin panel.
+                    🌱 Better products<br>
+                    🚚 Safe delivery<br>
+                    💚 Happy customers
                 </p>
-
-                <a href="/admin/"
-                   class="btn btn-outline-light rounded-pill px-4">
-                    Open Admin
-                </a>
 
             </div>
 
         </div>
 
-        <hr class="mt-5">
+        <hr class="border-secondary my-4">
 
         <div class="text-center small">
-            © 2026 ShopEasy Garden · Built with Django 🌱
+            © 2026 ShopEasy Garden. All rights reserved.
         </div>
 
     </div>
+
 </footer>
 
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
