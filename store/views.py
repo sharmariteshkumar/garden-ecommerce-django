@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_POST
+from django.db.models import Q
 
 from .models import Product, Category
 
@@ -145,3 +146,36 @@ def remove_from_cart(request, product_id):
     request.session.modified = True
 
     return redirect("cart")
+
+
+def all_products(request):
+    products = Product.objects.filter(is_available=True)
+    categories = Category.objects.all()
+
+    # 1. Search Logic
+    keyword = request.GET.get('keyword')
+    if keyword:
+        products = products.filter(
+            Q(name__icontains=keyword) | Q(description__icontains=keyword)
+        )
+
+    # 2. Category Filter Logic
+    category_slug = request.GET.get('category')
+    if category_slug:
+        products = products.filter(category__slug=category_slug)
+
+    # 3. Sorting Logic
+    sort_by = request.GET.get('sort')
+    if sort_by == 'price_low':
+        products = products.order_by('price')
+    elif sort_by == 'price_high':
+        products = products.order_by('-price')
+    elif sort_by == 'latest':
+        products = products.order_by('-created_at')
+
+    context = {
+        'products': products,
+        'categories': categories,
+        'product_count': products.count(),
+    }
+    return render(request, 'store/all_products.html', context)
