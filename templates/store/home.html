@@ -670,10 +670,6 @@
             min-width: 0;
         }
 
-        .product-card {
-            height: 100%;
-        }
-
         @media (max-width: 1199px) {
             .products-grid {
                 grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1495,11 +1491,9 @@
 
             <div class="section-heading">
 
-                <div class="d-flex flex-column flex-md-row
-                        align-items-md-end justify-content-between gap-3">
+                <div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3">
 
                     <div>
-
                         <span class="section-kicker">
                             Our Collection
                         </span>
@@ -1507,13 +1501,14 @@
                         <h2 class="section-title">
                             Featured Plants
                         </h2>
-
                     </div>
 
-                    <a href="#products" class="view-all">
+                    {% if products|length > 6 %}
+                    <button type="button" id="toggleProductsBtn" class="btn border-0 p-0 view-all">
                         View all products
-                        <i class="bi bi-arrow-right"></i>
-                    </a>
+                        <i class="bi bi-arrow-right" id="toggleIcon"></i>
+                    </button>
+                    {% endif %}
 
                 </div>
 
@@ -1526,7 +1521,8 @@
 
                 {% for product in products %}
 
-                <div class="product-grid-item">
+                <div
+                    class="product-grid-item product-card-wrapper {% if forloop.counter > 6 %}d-none extra-product{% endif %}">
 
                     <div class="product-card">
 
@@ -1629,7 +1625,6 @@
         </div>
 
     </section>
-
 
     <!-- =========================================================
      WHY SHOP EASY
@@ -1910,6 +1905,35 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    <!-- Script for Show More / View All Toggle -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleBtn = document.getElementById("toggleProductsBtn");
+            const extraProducts = document.querySelectorAll(".extra-product");
+            const toggleIcon = document.getElementById("toggleIcon");
+
+            if (toggleBtn) {
+                let isExpanded = false;
+
+                toggleBtn.addEventListener("click", function () {
+                    isExpanded = !isExpanded;
+
+                    extraProducts.forEach(item => {
+                        item.classList.toggle("d-none", !isExpanded);
+                    });
+
+                    if (isExpanded) {
+                        toggleBtn.childNodes[0].nodeValue = "Show Less ";
+                        toggleIcon.className = "bi bi-arrow-up";
+                    } else {
+                        toggleBtn.childNodes[0].nodeValue = "View all products ";
+                        toggleIcon.className = "bi bi-arrow-right";
+                    }
+                });
+            }
+        });
     </script>
 
 </body>
