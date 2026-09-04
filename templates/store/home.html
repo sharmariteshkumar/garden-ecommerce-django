@@ -1504,10 +1504,9 @@
                     </div>
 
                     {% if products|length > 6 %}
-                    <button type="button" id="toggleProductsBtn" class="btn border-0 p-0 view-all">
-                        View all products
-                        <i class="bi bi-arrow-right" id="toggleIcon"></i>
-                    </button>
+                    <a href="{% url 'all_products' %}" class="btn btn-primary view-all">
+                        View All Products <i class="bi bi-arrow-right"></i>
+                    </a>
                     {% endif %}
 
                 </div>
