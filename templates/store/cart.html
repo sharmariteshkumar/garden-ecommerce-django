@@ -1,0 +1,703 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Your Cart | ShopEasy Garden</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        :root {
+            --green: #198754;
+            --dark-green: #146c43;
+            --light-green: #eaf7ef;
+            --soft-bg: #f7faf8;
+            --text-dark: #17221b;
+            --muted: #6c757d;
+        }
+
+        body {
+            background: var(--soft-bg);
+            color: var(--text-dark);
+            font-family: Arial, sans-serif;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: #ffffff;
+            border-bottom: 1px solid #e8eee9;
+            padding: 16px 0;
+        }
+
+        .brand {
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            text-decoration: none;
+        }
+
+        .brand span {
+            color: var(--green);
+        }
+
+        .continue-btn {
+            border: 1px solid #d8e4dc;
+            color: var(--text-dark);
+            border-radius: 10px;
+            padding: 9px 16px;
+            text-decoration: none;
+            transition: 0.2s ease;
+        }
+
+        .continue-btn:hover {
+            background: var(--light-green);
+            color: var(--dark-green);
+            border-color: #b9d9c5;
+        }
+
+        /* PAGE HEADER */
+        .page-header {
+            padding: 55px 0 30px;
+        }
+
+        .page-header h1 {
+            font-size: 2.3rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: var(--muted);
+            margin: 0;
+        }
+
+        /* CART CARD */
+        .cart-card,
+        .summary-card {
+            background: #ffffff;
+            border: 1px solid #e5ece7;
+            border-radius: 18px;
+            box-shadow: 0 8px 25px rgba(25, 135, 84, 0.05);
+        }
+
+        .cart-card {
+            overflow: hidden;
+        }
+
+        .cart-item {
+            padding: 22px;
+            border-bottom: 1px solid #edf1ee;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .product-image {
+            width: 105px;
+            height: 105px;
+            object-fit: cover;
+            border-radius: 14px;
+            background: var(--light-green);
+        }
+
+        .product-placeholder {
+            width: 105px;
+            height: 105px;
+            border-radius: 14px;
+            background: var(--light-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .product-name {
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .product-name:hover {
+            color: var(--green);
+        }
+
+        .category-name {
+            color: var(--green);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .unit-price {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .item-total {
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        /* QUANTITY */
+        .quantity-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quantity-input {
+            width: 65px;
+            height: 40px;
+            text-align: center;
+            border: 1px solid #d9e3dc;
+            border-radius: 9px;
+            font-weight: 600;
+        }
+
+        .quantity-input:focus {
+            outline: none;
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.1);
+        }
+
+        .qty-btn {
+            width: 38px;
+            height: 38px;
+            border: 1px solid #d9e3dc;
+            background: #ffffff;
+            border-radius: 9px;
+            transition: 0.2s ease;
+            cursor: pointer;
+        }
+
+        .qty-btn:hover {
+            background: var(--light-green);
+            border-color: #afd2bb;
+            color: var(--dark-green);
+        }
+
+        .update-btn {
+            border: none;
+            background: var(--light-green);
+            color: var(--dark-green);
+            border-radius: 8px;
+            padding: 7px 12px;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .update-btn:hover {
+            background: #d9f0e1;
+        }
+
+        .remove-btn {
+            border: none;
+            background: transparent;
+            color: #dc3545;
+            font-size: 0.9rem;
+            padding: 6px 0;
+        }
+
+        .remove-btn:hover {
+            color: #b02a37;
+        }
+
+        /* SUMMARY */
+        .summary-card {
+            padding: 25px;
+            position: sticky;
+            top: 20px;
+        }
+
+        .summary-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 22px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            color: #5f6963;
+        }
+
+        .summary-row strong {
+            color: var(--text-dark);
+        }
+
+        .free-delivery {
+            color: var(--green);
+            font-weight: 600;
+        }
+
+        .summary-total {
+            border-top: 1px solid #e5ece7;
+            padding-top: 18px;
+            margin-top: 18px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            border: none;
+            background: var(--green);
+            color: #ffffff;
+            padding: 13px 20px;
+            border-radius: 11px;
+            font-weight: 700;
+            margin-top: 22px;
+            transition: 0.2s ease;
+        }
+
+        .checkout-btn:hover {
+            background: var(--dark-green);
+            transform: translateY(-1px);
+        }
+
+        .secure-text {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.8rem;
+            margin-top: 14px;
+        }
+
+        /* EMPTY CART */
+        .empty-cart {
+            background: #ffffff;
+            border: 1px solid #e5ece7;
+            border-radius: 20px;
+            text-align: center;
+            padding: 75px 20px;
+            box-shadow: 0 8px 25px rgba(25, 135, 84, 0.05);
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: var(--light-green);
+            color: var(--green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+        }
+
+        .shop-btn {
+            display: inline-block;
+            margin-top: 20px;
+            background: var(--green);
+            color: white;
+            text-decoration: none;
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .shop-btn:hover {
+            background: var(--dark-green);
+            color: white;
+        }
+
+        @media (max-width: 767px) {
+            .page-header {
+                padding-top: 35px;
+            }
+
+            .page-header h1 {
+                font-size: 1.9rem;
+            }
+
+            .cart-item {
+                padding: 16px;
+            }
+
+            .product-image,
+            .product-placeholder {
+                width: 80px;
+                height: 80px;
+            }
+
+            .item-total {
+                margin-top: 10px;
+            }
+
+            .summary-card {
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between w-100">
+
+                <a href="{% url 'store_home' %}" class="brand">
+                    🌿 ShopEasy <span>Garden</span>
+                </a>
+
+                <a href="{% url 'store_home' %}" class="continue-btn">
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Continue Shopping
+                </a>
+
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <h1>
+                <i class="bi bi-bag me-2"></i>
+                Your Cart
+            </h1>
+
+            <p>
+                {% if cart_items %}
+                {{ cart_items|length }} product{{ cart_items|length|pluralize }} in your cart
+                {% else %}
+                Your shopping cart is empty
+                {% endif %}
+            </p>
+        </div>
+
+
+        {% if cart_items %}
+
+        <div class="row g-4 mb-5">
+
+            <!-- CART ITEMS -->
+            <div class="col-lg-8">
+
+                <div class="cart-card">
+
+                    {% for item in cart_items %}
+
+                    <div class="cart-item">
+
+                        <div class="row align-items-center g-3">
+
+                            <!-- IMAGE -->
+                            <div class="col-auto">
+
+                                <a href="{% url 'product_detail' item.product.slug %}">
+
+                                    {% if item.product.image %}
+                                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}"
+                                        class="product-image">
+                                    {% else %}
+                                    <div class="product-placeholder">
+                                        🌿
+                                    </div>
+                                    {% endif %}
+
+                                </a>
+
+                            </div>
+
+
+                            <!-- PRODUCT INFO -->
+                            <div class="col">
+
+                                <div class="category-name mb-1">
+                                    {{ item.product.category.name }}
+                                </div>
+
+                                <a href="{% url 'product_detail' item.product.slug %}" class="product-name">
+                                    {{ item.product.name }}
+                                </a>
+
+                                <div class="unit-price mt-1">
+                                    ₹{{ item.product.price }} each
+                                </div>
+
+                                {% if item.product.stock > 0 %}
+                                <small class="text-success">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    In Stock
+                                </small>
+                                {% endif %}
+
+                            </div>
+
+
+                            <!-- QUANTITY -->
+                            <div class="col-md-auto">
+
+                                <form method="POST" action="{% url 'update_cart' item.product.id %}"
+                                    class="quantity-form">
+
+                                    {% csrf_token %}
+
+                                    <div class="quantity-box">
+
+                                        <button type="button" class="qty-btn minus-btn">
+                                            −
+                                        </button>
+
+                                        <input type="number" name="quantity" class="quantity-input"
+                                            value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}"
+                                            data-price="{{ item.product.price }}">
+
+                                        <button type="button" class="qty-btn plus-btn">
+                                            +
+                                        </button>
+
+                                    </div>
+
+                                </form>
+
+                            </div>
+
+
+                            <!-- PRICE + REMOVE -->
+                            <div class="col-md-auto text-md-end">
+
+                                <span class="item-total">
+                                    ₹{{ item.item_total }}
+                                </span>
+
+                                <form method="POST" action="{% url 'remove_from_cart' item.product.id %}">
+                                    {% csrf_token %}
+
+                                    <button type="submit" class="remove-btn">
+                                        <i class="bi bi-trash3 me-1"></i>
+                                        Remove
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+
+            <!-- ORDER SUMMARY -->
+            <div class="col-lg-4">
+
+                <div class="summary-card">
+
+                    <div class="summary-title">
+                        Order Summary
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <strong id="cart-subtotal">₹{{ total }}</strong>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Delivery</span>
+                        <span class="free-delivery">FREE</span>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Taxes</span>
+                        <span>Included</span>
+                    </div>
+
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span id="cart-total">₹{{ total }}</span>
+                    </div>
+
+                    <!-- Checkout will be connected in next step -->
+                    <button type="button" class="checkout-btn" onclick="alert('Checkout feature coming next!')">
+                        <i class="bi bi-lock-fill me-2"></i>
+                        Proceed to Checkout
+                    </button>
+
+                    <div class="secure-text">
+                        <i class="bi bi-shield-check me-1"></i>
+                        Secure checkout
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% else %}
+
+        <!-- EMPTY CART -->
+        <div class="empty-cart mb-5">
+
+            <div class="empty-icon">
+                <i class="bi bi-bag-x"></i>
+            </div>
+
+            <h2 class="fw-bold">
+                Your cart is empty
+            </h2>
+
+            <p class="text-muted mb-0">
+                Looks like you haven't added any plants yet.
+            </p>
+
+            <a href="{% url 'store_home' %}" class="shop-btn">
+                <i class="bi bi-shop me-2"></i>
+                Start Shopping
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const inputs = document.querySelectorAll(".quantity-input");
+
+            function updatePrices() {
+
+                let cartTotal = 0;
+
+                inputs.forEach(function (input) {
+
+                    let quantity = parseInt(input.value) || 1;
+                    const min = parseInt(input.min) || 1;
+                    const max = parseInt(input.max) || 999999;
+                    const price = parseFloat(input.dataset.price) || 0;
+
+                    if (quantity < min) {
+                        quantity = min;
+                        input.value = min;
+                    }
+
+                    if (quantity > max) {
+                        quantity = max;
+                        input.value = max;
+                    }
+
+                    const itemTotal = quantity * price;
+
+                    const cartItem = input.closest(".cart-item");
+
+                    if (cartItem) {
+                        const itemTotalElement =
+                            cartItem.querySelector(".item-total");
+
+                        if (itemTotalElement) {
+                            itemTotalElement.textContent =
+                                "₹" + itemTotal.toFixed(2);
+                        }
+                    }
+
+                    cartTotal += itemTotal;
+                });
+
+                const totalElements =
+                    document.querySelectorAll(".cart-total-value");
+
+                totalElements.forEach(function (element) {
+                    element.textContent = "₹" + cartTotal.toFixed(2);
+                });
+            }
+
+
+            /* PLUS BUTTON */
+
+            document.querySelectorAll(".plus-btn").forEach(function (button) {
+
+                button.addEventListener("click", function () {
+
+                    const form = button.closest(".quantity-form");
+                    const input = form.querySelector(".quantity-input");
+
+                    let quantity = parseInt(input.value) || 1;
+                    const max = parseInt(input.max) || 999999;
+
+                    if (quantity < max) {
+                        input.value = quantity + 1;
+                    }
+
+                    updatePrices();
+
+                    form.submit();
+                });
+
+            });
+
+
+            /* MINUS BUTTON */
+
+            document.querySelectorAll(".minus-btn").forEach(function (button) {
+
+                button.addEventListener("click", function () {
+
+                    const form = button.closest(".quantity-form");
+                    const input = form.querySelector(".quantity-input");
+
+                    let quantity = parseInt(input.value) || 1;
+
+                    if (quantity > 1) {
+                        input.value = quantity - 1;
+                    }
+
+                    updatePrices();
+
+                    form.submit();
+                });
+
+            });
+
+
+            /* MANUAL INPUT */
+
+            inputs.forEach(function (input) {
+
+                input.addEventListener("change", function () {
+
+                    const form = input.closest(".quantity-form");
+
+                    updatePrices();
+
+                    form.submit();
+
+                });
+
+            });
+
+
+            updatePrices();
+
+        });
+    </script>
+
+</body>
+
+</html>

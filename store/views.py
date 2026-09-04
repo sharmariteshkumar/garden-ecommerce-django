@@ -1,5 +1,7 @@
+from decimal import Decimal
+
 from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Q
+from django.views.decorators.http import require_POST
 
 from .models import Product, Category
 
@@ -8,27 +10,9 @@ def home(request):
     products = Product.objects.filter(is_available=True)
     categories = Category.objects.all()
 
-    query = request.GET.get("q", "").strip()
-
-    if query:
-        products = products.filter(
-            Q(name__icontains=query) |
-            Q(description__icontains=query) |
-            Q(category__name__icontains=query)
-        )
-
-    category_slug = request.GET.get("category", "").strip()
-
-    if category_slug:
-        products = products.filter(
-            category__slug=category_slug
-        )
-
     context = {
         "products": products,
         "categories": categories,
-        "query": query,
-        "selected_category": category_slug,
     }
 
     return render(request, "store/home.html", context)
@@ -41,23 +25,14 @@ def product_detail(request, slug):
         is_available=True
     )
 
-    related_products = Product.objects.filter(
-        category=product.category,
-        is_available=True
-    ).exclude(
-        id=product.id
-    )[:4]
-
     return render(
         request,
         "store/product_detail.html",
-        {
-            "product": product,
-            "related_products": related_products,
-        }
+        {"product": product}
     )
 
 
+@require_POST
 def add_to_cart(request, product_id):
     product = get_object_or_404(
         Product,
@@ -65,13 +40,26 @@ def add_to_cart(request, product_id):
         is_available=True
     )
 
+    quantity = int(request.POST.get("quantity", 1))
+
+    if quantity < 1:
+        quantity = 1
+
+    if product.stock < 1:
+        return redirect("store_home")
+
     cart = request.session.get("cart", {})
+
     product_id = str(product.id)
+    current_quantity = int(cart.get(product_id, 0))
 
-    current_quantity = cart.get(product_id, 0)
+    new_quantity = current_quantity + quantity
 
-    if current_quantity < product.stock:
-        cart[product_id] = current_quantity + 1
+    # Stock se zyada add nahi hone dena
+    if new_quantity > product.stock:
+        new_quantity = product.stock
+
+    cart[product_id] = new_quantity
 
     request.session["cart"] = cart
     request.session.modified = True
@@ -82,63 +70,78 @@ def add_to_cart(request, product_id):
 def cart(request):
     cart_data = request.session.get("cart", {})
 
-    cart_items = []
-    subtotal = 0
-
-    for product_id, quantity in cart_data.items():
-        product = Product.objects.filter(
-            id=product_id,
-            is_available=True
-        ).first()
-
-        if product:
-            total = product.price * quantity
-            subtotal += total
-
-            cart_items.append({
-                "product": product,
-                "quantity": quantity,
-                "total": total,
-            })
-
-    context = {
-        "cart_items": cart_items,
-        "subtotal": subtotal,
-        "total": subtotal,
-    }
-
-    return render(request, "store/cart.html", context)
-
-
-def update_cart(request, product_id):
-    product = get_object_or_404(
-        Product,
-        id=product_id,
+    products = Product.objects.filter(
+        id__in=cart_data.keys(),
         is_available=True
     )
 
-    quantity = int(request.POST.get("quantity", 1))
+    cart_items = []
+    total = Decimal("0.00")
 
-    cart_data = request.session.get("cart", {})
-    product_id = str(product.id)
+    for product in products:
+        quantity = int(cart_data.get(str(product.id), 0))
 
-    if quantity <= 0:
-        cart_data.pop(product_id, None)
-    else:
-        cart_data[product_id] = min(quantity, product.stock)
+        if quantity <= 0:
+            continue
+
+        # Stock change hone par quantity ko stock ke andar rakho
+        if quantity > product.stock:
+            quantity = product.stock
+            cart_data[str(product.id)] = quantity
+
+        item_total = product.price * quantity
+        total += item_total
+
+        cart_items.append({
+            "product": product,
+            "quantity": quantity,
+            "item_total": item_total,
+        })
 
     request.session["cart"] = cart_data
     request.session.modified = True
 
+    return render(
+        request,
+        "store/cart.html",
+        {
+            "cart_items": cart_items,
+            "total": total,
+        }
+    )
+
+
+@require_POST
+def update_cart(request, product_id):
+
+    if request.method == "POST":
+
+        quantity = int(request.POST.get("quantity", 1))
+
+        cart = request.session.get("cart", {})
+
+        product_id = str(product_id)
+
+        if quantity > 0:
+            cart[product_id] = quantity
+        else:
+            cart.pop(product_id, None)
+
+        request.session["cart"] = cart
+        request.session.modified = True
+
     return redirect("cart")
 
 
+@require_POST
 def remove_from_cart(request, product_id):
-    cart_data = request.session.get("cart", {})
+    cart = request.session.get("cart", {})
 
-    cart_data.pop(str(product_id), None)
+    product_id = str(product_id)
 
-    request.session["cart"] = cart_data
+    cart.pop(product_id, None)
+
+    request.session["cart"] = cart
     request.session.modified = True
 
     return redirect("cart")

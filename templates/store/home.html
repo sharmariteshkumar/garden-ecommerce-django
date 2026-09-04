@@ -660,6 +660,38 @@
             background: var(--green);
         }
 
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 24px;
+        }
+
+        .product-grid-item {
+            min-width: 0;
+        }
+
+        .product-card {
+            height: 100%;
+        }
+
+        @media (max-width: 1199px) {
+            .products-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 991px) {
+            .products-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 575px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         /* =========================================================
            BENEFITS
         ========================================================= */
@@ -1095,25 +1127,29 @@
 
                 <div class="nav-actions">
                     <form class="search-box" method="GET" action="{% url 'store_home' %}">
-                        <form class="search-box" method="GET" action="{% url 'store_home' %}">
 
-                            <input type="search" name="q" value="{{ query }}" class="form-control"
-                                placeholder="Search plants, seeds, pots..." aria-label="Search products">
+                        <input type="search" name="q" value="{{ query }}" class="form-control"
+                            placeholder="Search plants, seeds, pots..." aria-label="Search products">
 
-                            <button type="submit" class="btn btn-light">
-                                <i class="bi bi-search"></i>
-                            </button>
+                        <button type="submit" class="btn btn-light">
+                            <i class="bi bi-search"></i>
+                        </button>
 
-                        </form>
+                    </form>
 
-                        <a href="#" class="nav-link d-none d-lg-block">
-                            Login
-                        </a>
+                    <a href="#" class="nav-link d-none d-lg-block">
+                        Login
+                    </a>
 
-                        <a href="#" class="cart-btn" aria-label="Shopping cart">
-                            <i class="bi bi-bag fs-5"></i>
-                            <span class="cart-count">0</span>
-                        </a>
+                    <a href="{% url 'cart' %}" class="cart-btn" aria-label="Shopping cart">
+
+                        <i class="bi bi-bag fs-5"></i>
+
+                        <span class="cart-count">
+                            {{ request.session.cart|length|default:"0" }}
+                        </span>
+
+                    </a>
 
                 </div>
 
@@ -1486,11 +1522,11 @@
 
             {% if products %}
 
-            <div class="row g-4">
+            <div class="products-grid">
 
                 {% for product in products %}
 
-                <div class="col-sm-6 col-lg-4 col-xl-3">
+                <div class="product-grid-item">
 
                     <div class="product-card">
 
@@ -1499,17 +1535,11 @@
                             <div class="product-image-wrap">
 
                                 {% if product.image %}
-
                                 <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
-
                                 {% else %}
-
-                                <div class="w-100 h-100 d-flex
-                                            align-items-center
-                                            justify-content-center" style="font-size: 4rem;">
+                                <div class="product-placeholder">
                                     🌿
                                 </div>
-
                                 {% endif %}
 
                                 <span class="product-badge">
@@ -1519,7 +1549,6 @@
                             </div>
 
                         </a>
-
 
                         <div class="product-body">
 
@@ -1531,26 +1560,37 @@
                                 {% endif %}
                             </div>
 
-
                             <h3 class="product-name">
                                 {{ product.name }}
                             </h3>
-
 
                             <p class="product-description">
                                 {{ product.description|truncatechars:75 }}
                             </p>
 
-
                             <div class="product-bottom">
 
-                                <span class="product-price">
-                                    {{ product.price }}
-                                </span>
+                                <div>
+                                    <div class="product-price">
+                                        {{ product.price }}
+                                    </div>
+
+                                    {% if product.stock > 0 %}
+                                    <small class="text-success">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                        In Stock
+                                    </small>
+                                    {% else %}
+                                    <small class="text-danger">
+                                        <i class="bi bi-x-circle-fill"></i>
+                                        Out of Stock
+                                    </small>
+                                    {% endif %}
+                                </div>
 
                                 <a href="{% url 'product_detail' product.slug %}" class="product-link">
-                                    View
-                                    <i class="bi bi-arrow-right"></i>
+                                    <i class="bi bi-eye"></i>
+                                    View Details
                                 </a>
 
                             </div>
@@ -1571,9 +1611,7 @@
 
                 <i class="bi bi-flower1"></i>
 
-                <h3>
-                    Your garden collection is coming soon
-                </h3>
+                <h3>Your garden collection is coming soon</h3>
 
                 <p>
                     Add products from the Django admin panel
@@ -1588,7 +1626,6 @@
             </div>
 
             {% endif %}
-
         </div>
 
     </section>
