@@ -4,6 +4,10 @@ set -o errexit
 python manage.py migrate
 python manage.py collectstatic --no-input
 
+# Seed / update plant products automatically on every deploy
+# (safe to run repeatedly - loaddata upserts by pk, no duplicates)
+python manage.py loaddata store/plant_products.json
+
 python manage.py shell <<'PY'
 import os
 from django.contrib.auth import get_user_model
