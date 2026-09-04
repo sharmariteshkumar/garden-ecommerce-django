@@ -94,5 +94,101 @@
       "created_at": "2026-09-03T05:15:00Z",
       "updated_at": "2026-09-03T05:15:00Z"
     }
+  },
+  {
+    "model": "store.product",
+    "pk": 5,
+    "fields": {
+      "category": 1,
+      "name": "Areca Palm",
+      "slug": "areca-palm",
+      "description": "Elegant indoor palm that purifies air and gives a tropical vibe.",
+      "price": "599.00",
+      "stock": 10,
+      "image": "products/areca-palm.jpg",
+      "is_available": true,
+      "created_at": "2026-09-03T05:20:00Z",
+      "updated_at": "2026-09-03T05:20:00Z"
+    }
+  },
+  {
+    "model": "store.product",
+    "pk": 6,
+    "fields": {
+      "category": 1,
+      "name": "Peace Lily",
+      "slug": "peace-lily",
+      "description": "Beautiful dark green leaves with elegant white blooms.",
+      "price": "349.00",
+      "stock": 12,
+      "image": "products/peace-lily.jpg",
+      "is_available": true,
+      "created_at": "2026-09-03T05:25:00Z",
+      "updated_at": "2026-09-03T05:25:00Z"
+    }
+  },
+  {
+    "model": "store.product",
+    "pk": 7,
+    "fields": {
+      "category": 4,
+      "name": "Jade Plant",
+      "slug": "jade-plant",
+      "description": "Popular succulent considered to bring good luck and wealth.",
+      "price": "199.00",
+      "stock": 18,
+      "image": "products/jade-plant.jpg",
+      "is_available": true,
+      "created_at": "2026-09-03T05:30:00Z",
+      "updated_at": "2026-09-03T05:30:00Z"
+    }
+  },
+  {
+    "model": "store.product",
+    "pk": 8,
+    "fields": {
+      "category": 1,
+      "name": "Rubber Plant",
+      "slug": "rubber-plant",
+      "description": "Bold and glossy leaves, great for modern home interiors.",
+      "price": "449.00",
+      "stock": 8,
+      "image": "products/rubber-plant.jpg",
+      "is_available": true,
+      "created_at": "2026-09-03T05:35:00Z",
+      "updated_at": "2026-09-03T05:35:00Z"
+    }
+  },
+  {
+    "model": "store.product",
+    "pk": 9,
+    "fields": {
+      "category": 2,
+      "name": "Boston Fern",
+      "slug": "boston-fern",
+      "description": "Lush green hanging fern plant perfect for outdoor balconies.",
+      "price": "279.00",
+      "stock": 15,
+      "image": "products/boston-fern.jpg",
+      "is_available": true,
+      "created_at": "2026-09-03T05:40:00Z",
+      "updated_at": "2026-09-03T05:40:00Z"
+    }
+  },
+  {
+    "model": "store.product",
+    "pk": 10,
+    "fields": {
+      "category": 3,
+      "name": "Jasmine Plant",
+      "slug": "jasmine-plant",
+      "description": "Fragrant white flowering plant for gardens and outdoor spaces.",
+      "price": "229.00",
+      "stock": 22,
+      "image": "products/jasmine-plant.jpg",
+      "is_available": true,
+      "created_at": "2026-09-03T05:45:00Z",
+      "updated_at": "2026-09-03T05:45:00Z"
+    }
   }
 ]
