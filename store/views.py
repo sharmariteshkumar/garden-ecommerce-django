@@ -149,14 +149,15 @@ def remove_from_cart(request, product_id):
 
 
 def all_products(request):
+    # Only available products fetch karein
     products = Product.objects.filter(is_available=True)
     categories = Category.objects.all()
 
-    # 1. Search Logic
-    keyword = request.GET.get('keyword')
-    if keyword:
+    # 1. Search Logic ('q' aur 'keyword' dono check karega)
+    query = request.GET.get('q') or request.GET.get('keyword')
+    if query:
         products = products.filter(
-            Q(name__icontains=keyword) | Q(description__icontains=keyword)
+            Q(name__icontains=query) | Q(description__icontains=query)
         )
 
     # 2. Category Filter Logic
@@ -166,12 +167,14 @@ def all_products(request):
 
     # 3. Sorting Logic
     sort_by = request.GET.get('sort')
-    if sort_by == 'price_low':
+    if sort_by in ['price_asc', 'price_low']:
         products = products.order_by('price')
-    elif sort_by == 'price_high':
+    elif sort_by in ['price_desc', 'price_high']:
         products = products.order_by('-price')
     elif sort_by == 'latest':
         products = products.order_by('-created_at')
+    else:
+        products = products.order_by('-id')  # Default ordering
 
     context = {
         'products': products,
