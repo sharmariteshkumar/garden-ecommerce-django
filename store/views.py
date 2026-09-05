@@ -7,7 +7,7 @@ from django.db.models import Q
 from .models import Product, Category
 
 
-def store_home(request):
+def home(request):
     products = Product.objects.filter(is_available=True)
     categories = Category.objects.all()
 
