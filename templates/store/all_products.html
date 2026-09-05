@@ -219,7 +219,7 @@
                 <select name="category" class="form-select" onchange="document.getElementById('filterForm').submit();">
                     <option value="">All Categories</option>
                     {% for cat in categories %}
-                    <option value="{{ cat.slug }}" {% if request.GET.category==cat.slug %} selected{% endif %}>
+                    <option value="{{ cat.slug }}" {% if request.GET.category == cat.slug %} selected{% endif %}>
                         {{ cat.name }}
                     </option>
                     {% endfor %}
@@ -229,9 +229,9 @@
             <div class="col-md-3">
                 <select name="sort" class="form-select" onchange="document.getElementById('filterForm').submit();">
                     <option value="">Sort By</option>
-                    <option value="price_asc" {% if request.GET.sort=='price_asc' %}selected{% endif %}>Price: Low to
+                    <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Price: Low to
                         High</option>
-                    <option value="price_desc" {% if request.GET.sort=='price_desc' %}selected{% endif %}>Price: High to
+                    <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Price: High to
                         Low</option>
                 </select>
             </div>
