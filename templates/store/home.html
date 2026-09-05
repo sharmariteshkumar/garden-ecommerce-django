@@ -1122,7 +1122,7 @@
 
 
                 <div class="nav-actions">
-                    <form class="search-box" method="GET" action="{% url 'store_home' %}">
+                    <form class="search-box" method="GET" action="{% url 'home' %}">
 
                         <input type="search" name="q" value="{{ query }}" class="form-control"
                             placeholder="Search plants, seeds, pots..." aria-label="Search products">
@@ -1386,7 +1386,7 @@
             <div class="row g-4">
                 {% for category in categories %}
                 <div class="col-6 col-lg-3">
-                    <a href="{% url 'store_home' %}?category={{ category.slug }}"
+                    <a href="{% url 'home' %}?category={{ category.slug }}"
                         class="text-decoration-none text-dark">
                         <div class="category-card">
 
