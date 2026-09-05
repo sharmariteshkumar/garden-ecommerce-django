@@ -1504,8 +1504,9 @@
                     </div>
 
                     {% if products|length > 6 %}
-                    <a href="{% url 'all_products' %}" class="btn btn-primary view-all">
-                        View All Products <i class="bi bi-arrow-right"></i>
+                    <!-- Updated Green Themed Button -->
+                    <a href="{% url 'all_products' %}" class="btn btn-outline-success rounded-3 fw-bold px-3 py-2">
+                        View All Products <i class="bi bi-arrow-right ms-1"></i>
                     </a>
                     {% endif %}
 

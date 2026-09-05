@@ -29,6 +29,7 @@
             line-height: 1.6;
         }
 
+        /* Home Page Matching Navbar */
         .main-navbar {
             background: rgba(255, 255, 255, 0.97);
             border-bottom: 1px solid rgba(47, 107, 63, 0.08);
@@ -85,6 +86,7 @@
             font-weight: 800;
         }
 
+        /* Home Page Matching Card Design */
         .product-card {
             height: 100%;
             overflow: hidden;
@@ -93,6 +95,8 @@
             background: white;
             box-shadow: 0 8px 25px rgba(24, 60, 37, 0.04);
             transition: all 0.28s ease;
+            display: flex;
+            flex-direction: column;
         }
 
         .product-card:hover {
@@ -103,6 +107,7 @@
         .product-image-wrap {
             height: 220px;
             overflow: hidden;
+            position: relative;
             background: var(--light-green);
         }
 
@@ -112,33 +117,55 @@
             object-fit: cover;
         }
 
+        .badge-fresh {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--dark-green);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
         .product-price {
             color: var(--dark-green);
-            font-size: 1.18rem;
-            font-weight: 850;
+            font-size: 1.15rem;
+            font-weight: 800;
         }
 
         .product-price::before {
             content: "₹";
             font-size: 0.9rem;
         }
+
+        .badge-stock {
+            color: #198754;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- NAVBAR (Same design as home.html) -->
+    <!-- NAVBAR (Home Page Identical Layout) -->
     <nav class="navbar navbar-expand-lg main-navbar py-2">
         <div class="container">
             <a class="navbar-brand" href="/">
                 <span class="brand-leaf">🌿</span>
-                ShopEasy
+                ShopEasy <span style="color: var(--green);">Garden</span>
             </a>
 
             <div class="d-flex align-items-center gap-3 ms-auto">
-                <a href="/" class="btn btn-outline-success btn-sm rounded-3 fw-bold">
-                    <i class="bi bi-house"></i> Home
-                </a>
+                <a href="/"
+                    class="btn btn-link text-success text-decoration-none fw-semibold d-none d-md-inline">Home</a>
+                <a href="{% url 'all_products' %}?category=plants"
+                    class="btn btn-link text-success text-decoration-none fw-semibold d-none d-md-inline">Plants</a>
+                <a href="{% url 'all_products' %}?category=seeds"
+                    class="btn btn-link text-success text-decoration-none fw-semibold d-none d-md-inline">Seeds</a>
+
                 <a href="{% url 'cart' %}" class="cart-btn text-decoration-none">
                     <i class="bi bi-bag fs-5"></i>
                     <span class="cart-count">
@@ -149,97 +176,107 @@
         </div>
     </nav>
 
-    <!-- CONTENT -->
+    <!-- MAIN CONTENT CONTAINER -->
     <div class="container my-5">
+
+        <!-- HEADER WITH RIGHT ALIGNED BACK TO SHOP BUTTON -->
         <div class="d-flex align-items-center justify-content-between mb-4">
-            <a href="/" class="btn btn-sm btn-light border rounded-3 text-secondary">
+            <h2 class="fw-bold m-0" style="color: var(--dark-green);">All Gardening Products</h2>
+            <a href="/" class="btn btn-outline-success btn-sm rounded-3 fw-bold px-3 py-2">
                 <i class="bi bi-arrow-left me-1"></i> Back to Shop
             </a>
-            <h3 class="fw-bold m-0" style="color: var(--dark-green);">All Gardening Products</h3>
-            <div style="width: 100px;"></div>
         </div>
 
-        <!-- SEARCH & AUTO-FILTER FORM -->
-        <form id="filterForm" action="{% url 'all_products' %}" method="GET" class="row g-2 mb-4 bg-white p-3 rounded-4 border shadow-sm">
-            
-            <!-- Search Field -->
+        <!-- SEARCH & AUTO-SUBMIT FILTERS -->
+        <form id="filterForm" action="{% url 'all_products' %}" method="GET"
+            class="row g-2 mb-4 bg-white p-3 rounded-4 border shadow-sm">
+
             <div class="col-md-6">
                 <div class="input-group">
-                    <input type="text" name="q" class="form-control" placeholder="Search plants, seeds..." value="{{ request.GET.q }}">
-                    <button class="btn btn-success" type="submit">
-                        <i class="bi bi-search"></i> Search
+                    <input type="text" name="q" class="form-control border-end-0" placeholder="Search plants, seeds..."
+                        value="{{ request.GET.q }}">
+                    <button class="btn btn-success px-4" type="submit">
+                        <i class="bi bi-search me-1"></i> Search
                     </button>
                 </div>
             </div>
 
-            <!-- Category Filter (Auto-submits on change) -->
             <div class="col-md-3">
                 <select name="category" class="form-select" onchange="document.getElementById('filterForm').submit();">
                     <option value="">All Categories</option>
                     {% for cat in categories %}
-                        <option value="{{ cat.slug }}" {% if request.GET.category == cat.slug %}selected{% endif %}>
-                            {{ cat.name }}
-                        </option>
+                    <option value="{{ cat.slug }}" {% if request.GET.category==cat.slug %}selected{% endif %}>
+                        {{ cat.name }}
+                    </option>
                     {% endfor %}
                 </select>
             </div>
 
-            <!-- Sort Option (Auto-submits on change) -->
             <div class="col-md-3">
                 <select name="sort" class="form-select" onchange="document.getElementById('filterForm').submit();">
                     <option value="">Sort By</option>
-                    <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
-                    <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                    <option value="price_asc" {% if request.GET.sort=='price_asc' %}selected{% endif %}>Price: Low to
+                        High</option>
+                    <option value="price_desc" {% if request.GET.sort=='price_desc' %}selected{% endif %}>Price: High to
+                        Low</option>
                 </select>
             </div>
 
         </form>
 
-        <!-- PRODUCTS GRID -->
+        <!-- PRODUCT GRID (Exact Home Page Card Style) -->
         {% if products %}
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-                {% for product in products %}
-                    <div class="col">
-                        <div class="product-card">
-                            <a href="{% url 'product_detail' product.slug %}" class="text-decoration-none">
-                                <div class="product-image-wrap">
-                                    {% if product.image %}
-                                        <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
-                                    {% else %}
-                                        <div class="d-flex align-items-center justify-content-center h-100 fs-1">🌿</div>
-                                    {% endif %}
-                                </div>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            {% for product in products %}
+            <div class="col">
+                <div class="product-card">
+                    <a href="{% url 'product_detail' product.slug %}" class="text-decoration-none">
+                        <div class="product-image-wrap">
+                            <span class="badge-fresh">🪴 Fresh Pick</span>
+                            {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+                            {% else %}
+                            <div class="d-flex align-items-center justify-content-center h-100 fs-1">🌿</div>
+                            {% endif %}
+                        </div>
+                    </a>
+
+                    <div class="p-3 d-flex flex-column flex-grow-1">
+                        <small class="text-uppercase text-success fw-bold mb-1"
+                            style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                            {% if product.category %}{{ product.category.name }}{% else %}Garden Collection{% endif %}
+                        </small>
+
+                        <h5 class="fw-bold text-dark mb-1 fs-6">{{ product.name }}</h5>
+
+                        <p class="text-muted small mb-3 flex-grow-1" style="font-size: 0.85rem;">
+                            {{ product.description|truncatechars:55 }}
+                        </p>
+
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div class="product-price">{{ product.price }}</div>
+                            <a href="{% url 'product_detail' product.slug %}"
+                                class="btn btn-sm btn-light border text-success fw-bold rounded-3 px-2 py-1"
+                                style="font-size: 0.8rem; background: var(--light-green);">
+                                <i class="bi bi-eye me-1"></i> View Details
                             </a>
+                        </div>
 
-                            <div class="p-3">
-                                <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">
-                                    {% if product.category %}{{ product.category.name }}{% else %}Garden Collection{% endif %}
-                                </small>
-
-                                <h5 class="fw-bold mt-1 text-dark fs-6">{{ product.name }}</h5>
-
-                                <p class="text-muted small mb-3">
-                                    {{ product.description|truncatechars:55 }}
-                                </p>
-
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div class="product-price">{{ product.price }}</div>
-                                    <a href="{% url 'product_detail' product.slug %}" class="btn btn-sm btn-outline-success rounded-3">
-                                        View
-                                    </a>
-                                </div>
-                            </div>
+                        <div class="badge-stock">
+                            <i class="bi bi-check-circle-fill me-1"></i> In Stock
                         </div>
                     </div>
-                {% endfor %}
+                </div>
             </div>
+            {% endfor %}
+        </div>
         {% else %}
-            <div class="text-center py-5 bg-white rounded-4 border">
-                <i class="bi bi-flower1 fs-1 text-success"></i>
-                <h4 class="mt-3 fw-bold">No Products Found</h4>
-                <p class="text-muted">Try adjusting your search terms or category selection.</p>
-                <a href="{% url 'all_products' %}" class="btn btn-success mt-2">Clear Filters</a>
-            </div>
+        <div class="text-center py-5 bg-white rounded-4 border">
+            <i class="bi bi-flower1 fs-1 text-success"></i>
+            <h4 class="mt-3 fw-bold">No Products Found</h4>
+            <p class="text-muted">Try adjusting your search query or category filter.</p>
+            <a href="{% url 'all_products' %}" class="btn btn-success mt-2">Clear Filters</a>
+        </div>
         {% endif %}
 
     </div>
