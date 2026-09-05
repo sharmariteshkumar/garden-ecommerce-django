@@ -205,7 +205,7 @@
                 <select name="category" class="form-select" onchange="document.getElementById('filterForm').submit();">
                     <option value="">All Categories</option>
                     {% for cat in categories %}
-                    <option value="{{ cat.slug }}" {% if request.GET.category==cat.slug %}selected{% endif %}>
+                    <option value="{{ cat.slug }}" {% if request.GET.category == cat.slug %} selected{% endif %}>
                         {{ cat.name }}
                     </option>
                     {% endfor %}
