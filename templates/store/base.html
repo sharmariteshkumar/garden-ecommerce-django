@@ -242,7 +242,7 @@
                 <div class="nav-actions">
                     <!-- Hide search box only on all_products page -->
                     {% if request.resolver_match.url_name != 'all_products' %}
-                    <form class="search-box" method="GET" action="{% url 'store_home' %}">
+                    <form class="search-box" method="GET" action="{% url 'home' %}">
                         <input type="search" name="q" value="{{ query }}" class="form-control"
                             placeholder="Search plants, seeds, pots..." aria-label="Search products">
                         <button type="submit" class="btn btn-light">
