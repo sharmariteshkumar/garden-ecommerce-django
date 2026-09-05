@@ -240,13 +240,16 @@
                 </ul>
 
                 <div class="nav-actions">
-                    <form class="search-box" method="GET" action="{% url 'all_products' %}">
-                        <input type="search" name="q" value="{{ request.GET.q }}" class="form-control"
-                            placeholder="Search plants, seeds..." aria-label="Search products">
+                    <!-- Hide search box only on all_products page -->
+                    {% if request.resolver_match.url_name != 'all_products' %}
+                    <form class="search-box" method="GET" action="{% url 'store_home' %}">
+                        <input type="search" name="q" value="{{ query }}" class="form-control"
+                            placeholder="Search plants, seeds, pots..." aria-label="Search products">
                         <button type="submit" class="btn btn-light">
                             <i class="bi bi-search"></i>
                         </button>
                     </form>
+                    {% endif %}
 
                     <a href="#" class="nav-link d-none d-lg-block">Login</a>
 
