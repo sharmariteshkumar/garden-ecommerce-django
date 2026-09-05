@@ -1384,96 +1384,35 @@
 
 
             <div class="row g-4">
-
+                {% for category in categories %}
                 <div class="col-6 col-lg-3">
-
-                    <a href="{% url 'store_home' %}" class="text-decoration-none text-dark">
+                    <a href="{% url 'store_home' %}?category={{ category.slug }}"
+                        class="text-decoration-none text-dark">
                         <div class="category-card">
 
                             <div class="category-icon">
-                                🛍️
-                            </div>
-
-                            <h3>Shop Essentials</h3>
-
-                            <p>
-                                Everything you need for your garden
-                            </p>
-
-                        </div>
-                    </a>
-
-                </div>
-
-
-                <div class="col-6 col-lg-3">
-
-                    <a href="#products" class="text-decoration-none">
-
-                        <div class="category-card">
-
-                            <div class="category-icon">
+                                {% if category.image %}
+                                <img src="{{ category.image.url }}" alt="{{ category.name }}"
+                                    style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
+                                {% else %}
                                 🌱
+                                {% endif %}
                             </div>
 
-                            <h3>Outdoor Plants</h3>
+                            <h3>{{ category.name }}</h3>
 
                             <p>
-                                Grow a beautiful garden
+                                Grow something amazing
                             </p>
 
                         </div>
-
                     </a>
-
                 </div>
-
-
-                <div class="col-6 col-lg-3">
-
-                    <a href="#products" class="text-decoration-none">
-
-                        <div class="category-card">
-
-                            <div class="category-icon">
-                                🌻
-                            </div>
-
-                            <h3>Seeds</h3>
-
-                            <p>
-                                Start something amazing
-                            </p>
-
-                        </div>
-
-                    </a>
-
+                {% empty %}
+                <div class="col-12 text-center text-muted">
+                    <p>No categories available.</p>
                 </div>
-
-
-                <div class="col-6 col-lg-3">
-
-                    <a href="#products" class="text-decoration-none">
-
-                        <div class="category-card">
-
-                            <div class="category-icon">
-                                🧤
-                            </div>
-
-                            <h3>Garden Care</h3>
-
-                            <p>
-                                Tools & essentials
-                            </p>
-
-                        </div>
-
-                    </a>
-
-                </div>
-
+                {% endfor %}
             </div>
 
         </div>
