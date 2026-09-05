@@ -1,300 +1,226 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Products | ShopEasy Garden</title>
+{% block content %}
+<style>
+  /* Base Layout & Filter Section */
+  .filter-bar {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  }
 
-    <!-- Bootstrap & Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  /* Product Card Container */
+  .product-card {
+    border: none;
+    border-radius: 18px;
+    background: #ffffff;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
 
-    <style>
-        :root {
-            --green: #2f6b3f;
-            --dark-green: #183c25;
-            --light-green: #eef7ed;
-            --cream: #faf8f1;
-            --text: #24352a;
-            --muted: #718078;
-            --border: #e7ece4;
-        }
+  .product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  }
 
-        body {
-            font-family: Inter, "Segoe UI", Arial, sans-serif;
-            color: var(--text);
-            background: var(--cream);
-            line-height: 1.6;
-        }
+  /* Image Wrapper & Badge */
+  .card-img-wrapper {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    background-color: #f8f9fa;
+  }
 
-        /* Home Page Matching Navbar */
-        .main-navbar {
-            background: rgba(255, 255, 255, 0.97);
-            border-bottom: 1px solid rgba(47, 107, 63, 0.08);
-            box-shadow: 0 5px 25px rgba(24, 60, 37, 0.06);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
+  .card-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
-        .navbar-brand {
-            color: var(--dark-green) !important;
-            font-size: 1.45rem;
-            font-weight: 800;
-        }
+  .badge-fresh {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #ffffff;
+    color: #198754;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    z-index: 2;
+  }
 
-        .brand-leaf {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            margin-right: 8px;
-            border-radius: 12px;
-            background: var(--light-green);
-            font-size: 1.25rem;
-        }
+  /* Card Body Styling */
+  .card-body-content {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
 
-        .cart-btn {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 43px;
-            height: 43px;
-            border-radius: 12px;
-            color: var(--green);
-            background: var(--light-green);
-        }
+  .category-text {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #8c98a4;
+    text-transform: uppercase;
+  }
 
-        .cart-count {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            min-width: 19px;
-            height: 19px;
-            padding: 0 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50px;
-            background: #d98b45;
-            color: white;
-            font-size: 0.68rem;
-            font-weight: 800;
-        }
+  .product-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #0b2e13;
+    margin-bottom: 6px;
+  }
 
-        /* Home Page Matching Card Design */
-        .product-card {
-            height: 100%;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            background: white;
-            box-shadow: 0 8px 25px rgba(24, 60, 37, 0.04);
-            transition: all 0.28s ease;
-            display: flex;
-            flex-direction: column;
-        }
+  .product-desc {
+    font-size: 0.85rem;
+    color: #6c757d;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
 
-        .product-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 45px rgba(24, 60, 37, 0.12);
-        }
+  .price-text {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #0b2e13;
+    line-height: 1;
+  }
 
-        .product-image-wrap {
-            height: 220px;
-            overflow: hidden;
-            position: relative;
-            background: var(--light-green);
-        }
+  .stock-status {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #198754;
+    margin-top: 4px;
+  }
 
-        .product-image-wrap img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+  /* View Details Button & Hover Effect */
+  .btn-view-details {
+    background-color: #eaf5ea;
+    color: #198754;
+    font-weight: 700;
+    font-size: 0.85rem;
+    border-radius: 10px;
+    padding: 8px 16px;
+    border: none;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease-in-out;
+  }
 
-        .badge-fresh {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            background: rgba(255, 255, 255, 0.9);
-            color: var(--dark-green);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.72rem;
-            font-weight: 700;
-        }
+  .btn-view-details:hover {
+    background-color: #198754;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(25, 135, 84, 0.25);
+  }
+</style>
 
-        .product-price {
-            color: var(--dark-green);
-            font-size: 1.15rem;
-            font-weight: 800;
-        }
+<div class="container py-4">
+  <!-- Page Header & Filter Form -->
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <h2 class="fw-bold text-success m-0">All Gardening Products</h2>
+    <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm rounded-3">
+      <i class="bi bi-arrow-left me-1"></i> Back to Home
+    </a>
+  </div>
 
-        .product-price::before {
-            content: "₹";
-            font-size: 0.9rem;
-        }
-
-        .badge-stock {
-            color: #198754;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .btn-view-details {
-            font-size: 0.8rem;
-            background-color: var(--light-green, #eef7ed);
-            color: #198754;
-            border: 1px solid #198754;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .btn-view-details:hover {
-            background-color: #198754;
-            color: #ffffff;
-            border-color: #198754;
-        }
-    </style>
-</head>
-
-<body>
-
-    <!-- NAVBAR (Home Page Identical Layout) -->
-    <nav class="navbar navbar-expand-lg main-navbar py-2">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <span class="brand-leaf">🌿</span>
-                ShopEasy <span style="color: var(--green);">Garden</span>
-            </a>
-
-            <div class="d-flex align-items-center gap-3 ms-auto">
-                <a href="/"
-                    class="btn btn-link text-success text-decoration-none fw-semibold d-none d-md-inline">Home</a>
-                <a href="{% url 'all_products' %}?category=plants"
-                    class="btn btn-link text-success text-decoration-none fw-semibold d-none d-md-inline">Plants</a>
-                <a href="{% url 'all_products' %}?category=seeds"
-                    class="btn btn-link text-success text-decoration-none fw-semibold d-none d-md-inline">Seeds</a>
-
-                <a href="{% url 'cart' %}" class="cart-btn text-decoration-none">
-                    <i class="bi bi-bag fs-5"></i>
-                    <span class="cart-count">
-                        {{ request.session.cart|length|default:"0" }}
-                    </span>
-                </a>
-            </div>
+  <div class="filter-bar p-3 mb-4">
+    <form method="GET" action="{% url 'all_products' %}" class="row g-2 align-items-center">
+      <!-- Search Input -->
+      <div class="col-md-5">
+        <div class="input-group">
+          <input type="text" name="q" class="form-control border-end-0" placeholder="Search products..." value="{{ request.GET.q }}">
+          <button class="btn btn-success" type="submit">
+            <i class="bi bi-search me-1"></i> Search
+          </button>
         </div>
-    </nav>
+      </div>
 
-    <!-- MAIN CONTENT CONTAINER -->
-    <div class="container my-5">
+      <!-- Category Select -->
+      <div class="col-md-3">
+        <select name="category" class="form-select" onchange="this.form.submit()">
+          <option value="">All Categories</option>
+          {% for cat in categories %}
+            <option value="{{ cat.slug }}" {% if request.GET.category == cat.slug %}selected{% endif %}>
+              {{ cat.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
 
-        <!-- HEADER WITH RIGHT ALIGNED BACK TO SHOP BUTTON -->
-        <div class="d-flex align-items-center justify-content-between mb-4">
-            <h2 class="fw-bold m-0" style="color: var(--dark-green);">All Gardening Products</h2>
-            <a href="/" class="btn btn-outline-success btn-sm rounded-3 fw-bold px-3 py-2">
-                <i class="bi bi-arrow-left me-1"></i> Back to Shop
-            </a>
-        </div>
+      <!-- Sort Select -->
+      <div class="col-md-4">
+        <select name="sort" class="form-select" onchange="this.form.submit()">
+          <option value="">Sort By Default</option>
+          <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+          <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+          <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>Newest First</option>
+        </select>
+      </div>
+    </form>
+  </div>
 
-        <!-- SEARCH & AUTO-SUBMIT FILTERS -->
-        <form id="filterForm" action="{% url 'all_products' %}" method="GET"
-            class="row g-2 mb-4 bg-white p-3 rounded-4 border shadow-sm">
+  <!-- Product Grid -->
+  <div class="row g-4">
+    {% for product in products %}
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        <div class="product-card">
+          <!-- Image Section -->
+          <div class="card-img-wrapper">
+            <span class="badge-fresh">🌱 Fresh Pick</span>
+            {% if product.image %}
+              <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+              <img src="{% static 'images/default-product.jpg' %}" alt="{{ product.name }}">
+            {% endif %}
+          </div>
 
-            <div class="col-md-6">
-                <div class="input-group">
-                    <input type="text" name="q" class="form-control border-end-0" placeholder="Search plants, seeds..."
-                        value="{{ request.GET.q }}">
-                    <button class="btn btn-success px-4" type="submit">
-                        <i class="bi bi-search me-1"></i> Search
-                    </button>
+          <!-- Body Content -->
+          <div class="card-body-content">
+            <div class="category-text mb-1">{{ product.category.name }}</div>
+            <h5 class="product-title">{{ product.name }}</h5>
+            <p class="product-desc">{{ product.description }}</p>
+
+            <!-- Price & Button -->
+            <div class="d-flex align-items-center justify-content-between mt-auto pt-2">
+              <div>
+                <div class="price-text">₹ {{ product.price }}</div>
+                <div class="stock-status">
+                  <i class="bi bi-check-circle-fill me-1"></i>In Stock
                 </div>
+              </div>
+              
+              <a href="{% url 'product_detail' product.slug %}" class="btn-view-details">
+                <i class="bi bi-eye me-1"></i> View Details
+              </a>
             </div>
-
-            <div class="col-md-3">
-                <select name="category" class="form-select" onchange="document.getElementById('filterForm').submit();">
-                    <option value="">All Categories</option>
-                    {% for cat in categories %}
-                    <option value="{{ cat.slug }}" {% if request.GET.category == cat.slug %} selected{% endif %}>
-                        {{ cat.name }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="col-md-3">
-                <select name="sort" class="form-select" onchange="document.getElementById('filterForm').submit();">
-                    <option value="">Sort By</option>
-                    <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Price: Low to
-                        High</option>
-                    <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Price: High to
-                        Low</option>
-                </select>
-            </div>
-
-        </form>
-
-        <!-- PRODUCT GRID (Exact Home Page Card Style) -->
-        {% if products %}
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-            {% for product in products %}
-            <div class="col">
-                <div class="product-card">
-                    <a href="{% url 'product_detail' product.slug %}" class="text-decoration-none">
-                        <div class="product-image-wrap">
-                            <span class="badge-fresh">🪴 Fresh Pick</span>
-                            {% if product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
-                            {% else %}
-                            <div class="d-flex align-items-center justify-content-center h-100 fs-1">🌿</div>
-                            {% endif %}
-                        </div>
-                    </a>
-
-                    <div class="p-3 d-flex flex-column flex-grow-1">
-                        <small class="text-uppercase text-success fw-bold mb-1"
-                            style="font-size: 0.7rem; letter-spacing: 0.5px;">
-                            {% if product.category %}{{ product.category.name }}{% else %}Garden Collection{% endif %}
-                        </small>
-
-                        <h5 class="fw-bold text-dark mb-1 fs-6">{{ product.name }}</h5>
-
-                        <p class="text-muted small mb-3 flex-grow-1" style="font-size: 0.85rem;">
-                            {{ product.description|truncatechars:55 }}
-                        </p>
-
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <div class="product-price">{{ product.price }}</div>
-                            <a href="{% url 'product_detail' product.slug %}"
-                                class="btn btn-sm rounded-3 px-2 py-1 fw-bold btn-view-details">
-                                <i class="bi bi-eye me-1"></i> View Details
-                            </a>
-                        </div>
-
-                        <div class="badge-stock">
-                            <i class="bi bi-check-circle-fill me-1"></i> In Stock
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
+          </div>
         </div>
-        {% else %}
-        <div class="text-center py-5 bg-white rounded-4 border">
-            <i class="bi bi-flower1 fs-1 text-success"></i>
-            <h4 class="mt-3 fw-bold">No Products Found</h4>
-            <p class="text-muted">Try adjusting your search query or category filter.</p>
-            <a href="{% url 'all_products' %}" class="btn btn-success mt-2">Clear Filters</a>
+      </div>
+    {% empty %}
+      <!-- Empty State -->
+      <div class="col-12 text-center py-5">
+        <div class="p-5 bg-white rounded-4 shadow-sm">
+          <i class="bi bi-flower2 text-success display-1 mb-3"></i>
+          <h3 class="fw-bold text-dark">No Products Found</h3>
+          <p class="text-muted">Try adjusting your search query or category filter.</p>
+          <a href="{% url 'all_products' %}" class="btn btn-success px-4 rounded-3">Clear Filters</a>
         </div>
-        {% endif %}
-
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-
-</html>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
