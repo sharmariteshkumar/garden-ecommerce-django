@@ -145,6 +145,20 @@
             font-size: 0.75rem;
             font-weight: 600;
         }
+
+        .btn-view-details {
+            font-size: 0.8rem;
+            background-color: var(--light-green, #eef7ed);
+            color: #198754;
+            border: 1px solid #198754;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-view-details:hover {
+            background-color: #198754;
+            color: #ffffff;
+            border-color: #198754;
+        }
     </style>
 </head>
 
@@ -205,7 +219,7 @@
                 <select name="category" class="form-select" onchange="document.getElementById('filterForm').submit();">
                     <option value="">All Categories</option>
                     {% for cat in categories %}
-                    <option value="{{ cat.slug }}" {% if request.GET.category == cat.slug %} selected{% endif %}>
+                    <option value="{{ cat.slug }}" {% if request.GET.category==cat.slug %} selected{% endif %}>
                         {{ cat.name }}
                     </option>
                     {% endfor %}
@@ -215,9 +229,9 @@
             <div class="col-md-3">
                 <select name="sort" class="form-select" onchange="document.getElementById('filterForm').submit();">
                     <option value="">Sort By</option>
-                    <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Price: Low to
+                    <option value="price_asc" {% if request.GET.sort=='price_asc' %}selected{% endif %}>Price: Low to
                         High</option>
-                    <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Price: High to
+                    <option value="price_desc" {% if request.GET.sort=='price_desc' %}selected{% endif %}>Price: High to
                         Low</option>
                 </select>
             </div>
@@ -256,8 +270,7 @@
                         <div class="d-flex align-items-center justify-content-between mb-2">
                             <div class="product-price">{{ product.price }}</div>
                             <a href="{% url 'product_detail' product.slug %}"
-                                class="btn btn-sm btn-light border text-success fw-bold rounded-3 px-2 py-1"
-                                style="font-size: 0.8rem; background: var(--light-green);">
+                                class="btn btn-sm rounded-3 px-2 py-1 fw-bold btn-view-details">
                                 <i class="bi bi-eye me-1"></i> View Details
                             </a>
                         </div>
