@@ -371,10 +371,7 @@ def checkout(request):
             ""
         ).strip()
 
-        pin_code = request.POST.get(
-            "pin_code",
-            ""
-        ).strip()
+        pin_code = request.POST.get("pincode", "").strip()
 
         # -------------------------
         # Required fields
