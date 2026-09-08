@@ -1,79 +1,338 @@
 {% extends "store/base.html" %}
 
+{% block title %}Checkout | ShopEasy{% endblock %}
+
 {% block content %}
 
-<div class="checkout-container">
+<style>
+    .checkout-page {
+        background: #f7f8f3;
+        min-height: calc(100vh - 100px);
+        padding: 55px 20px 80px;
+    }
 
-    <h1>Checkout</h1>
+    .checkout-container {
+        max-width: 1100px;
+        margin: auto;
+    }
 
-    <form method="POST" action="{% url 'place_order' %}">
-        {% csrf_token %}
+    .checkout-heading {
+        margin-bottom: 35px;
+    }
 
-        <input
-            type="text"
-            name="customer_name"
-            placeholder="Full Name"
-            required
-        >
+    .checkout-heading h1 {
+        color: #173d29;
+        font-size: 42px;
+        font-weight: 800;
+        margin: 0 0 8px;
+    }
 
-        <input
-            type="email"
-            name="customer_email"
-            placeholder="Email"
-            required
-        >
+    .checkout-heading p {
+        color: #718078;
+        font-size: 16px;
+        margin: 0;
+    }
 
-        <input
-            type="text"
-            name="customer_phone"
-            placeholder="Phone Number"
-            required
-        >
+    .checkout-grid {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 30px;
+        align-items: start;
+    }
 
-        <textarea
-            name="address"
-            placeholder="Full Address"
-            required
-        ></textarea>
+    .checkout-card,
+    .summary-card {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 30px;
+        border: 1px solid #e5ebe5;
+        box-shadow: 0 8px 30px rgba(25, 61, 41, 0.07);
+    }
 
-        <input
-            type="text"
-            name="city"
-            placeholder="City"
-            required
-        >
+    .card-title {
+        color: #173d29;
+        font-size: 22px;
+        font-weight: 750;
+        margin-bottom: 25px;
+    }
 
-        <input
-            type="text"
-            name="state"
-            placeholder="State"
-            required
-        >
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+    }
 
-        <input
-            type="text"
-            name="pincode"
-            placeholder="PIN Code"
-            required
-        >
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
 
-        <h3>Order Summary</h3>
+    .form-group.full {
+        grid-column: 1 / -1;
+    }
 
-        {% for item in cart_items %}
-            <p>
-                {{ item.product.name }}
-                × {{ item.quantity }}
-                — ₹{{ item.item_total }}
-            </p>
-        {% endfor %}
+    .form-group label {
+        color: #34483d;
+        font-size: 14px;
+        font-weight: 650;
+        margin-bottom: 7px;
+    }
 
-        <h2>Total: ₹{{ total }}</h2>
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #d9e2da;
+        border-radius: 10px;
+        padding: 13px 14px;
+        font-size: 15px;
+        outline: none;
+        background: #fbfcfa;
+        color: #24372d;
+        transition: 0.2s ease;
+    }
 
-        <button type="submit">
-            Place Order
-        </button>
+    .form-group textarea {
+        min-height: 105px;
+        resize: vertical;
+    }
 
-    </form>
+    .form-group input:focus,
+    .form-group textarea:focus {
+        border-color: #27834d;
+        background: #ffffff;
+        box-shadow: 0 0 0 3px rgba(39, 131, 77, 0.10);
+    }
+
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 15px 0;
+        border-bottom: 1px solid #edf1ed;
+    }
+
+    .order-item:last-child {
+        border-bottom: none;
+    }
+
+    .order-item-name {
+        color: #263b30;
+        font-weight: 650;
+    }
+
+    .order-item-qty {
+        color: #7a8880;
+        font-size: 14px;
+        margin-top: 4px;
+    }
+
+    .order-item-price {
+        color: #173d29;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px solid #e7ece7;
+    }
+
+    .total-label {
+        color: #173d29;
+        font-size: 20px;
+        font-weight: 750;
+    }
+
+    .total-price {
+        color: #16733d;
+        font-size: 25px;
+        font-weight: 850;
+    }
+
+    .place-order-btn {
+        width: 100%;
+        border: none;
+        border-radius: 11px;
+        padding: 15px 20px;
+        margin-top: 25px;
+        background: #16733d;
+        color: white;
+        font-size: 16px;
+        font-weight: 750;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .place-order-btn:hover {
+        background: #105c30;
+        transform: translateY(-1px);
+    }
+
+    .secure-checkout {
+        text-align: center;
+        color: #7b8981;
+        font-size: 13px;
+        margin-top: 15px;
+    }
+
+    /* Checkout page par navbar search hide */
+    .navbar-search,
+    .search-bar,
+    nav form {
+        display: none !important;
+    }
+
+    @media (max-width: 800px) {
+        .checkout-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .checkout-heading h1 {
+            font-size: 34px;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group.full {
+            grid-column: auto;
+        }
+    }
+
+    @media (max-width: 500px) {
+        .checkout-page {
+            padding: 35px 15px 60px;
+        }
+
+        .checkout-card,
+        .summary-card {
+            padding: 20px;
+        }
+
+        .checkout-heading h1 {
+            font-size: 30px;
+        }
+    }
+</style>
+
+<div class="checkout-page">
+
+    <div class="checkout-container">
+
+        <div class="checkout-heading">
+            <h1>Checkout</h1>
+            <p>Complete your details and place your order.</p>
+        </div>
+
+        <div class="checkout-grid">
+
+            <!-- CUSTOMER DETAILS -->
+            <div class="checkout-card">
+
+                <div class="card-title">
+                    Delivery Information
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" name="full_name" placeholder="Enter your full name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" name="email" placeholder="Enter your email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="tel" name="phone" placeholder="Enter phone number" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>PIN Code</label>
+                            <input type="text" name="pincode" placeholder="Enter PIN code" required>
+                        </div>
+
+                        <div class="form-group full">
+                            <label>Full Address</label>
+                            <textarea name="address" placeholder="House no., street, area..." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" name="city" placeholder="City" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>State</label>
+                            <input type="text" name="state" placeholder="State" required>
+                        </div>
+
+                    </div>
+
+                    <button type="submit" class="place-order-btn">
+                        Place Order
+                    </button>
+
+                </form>
+
+            </div>
+
+
+            <!-- ORDER SUMMARY -->
+            <div class="summary-card">
+
+                <div class="card-title">
+                    Order Summary
+                </div>
+
+                {% for item in cart_items %}
+
+                <div class="order-item">
+
+                    <div>
+                        <div class="order-item-name">
+                            {{ item.product.name }}
+                        </div>
+
+                        <div class="order-item-qty">
+                            Quantity: {{ item.quantity }}
+                        </div>
+                    </div>
+
+                    <div class="order-item-price">
+                        ₹{{ item.item_total }}
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+                <div class="total-row">
+                    <span class="total-label">Total</span>
+                    <span class="total-price">₹{{ total }}</span>
+                </div>
+
+                <div class="secure-checkout">
+                    🔒 Secure checkout
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
