@@ -2,10 +2,22 @@ from django.db import models
 import uuid
 
 
+# =========================================================
+# CATEGORY
+# =========================================================
+
 class Category(models.Model):
     name = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True)
-    image = models.ImageField(upload_to="categories/", blank=True, null=True)
+
+    slug = models.SlugField(
+        unique=True
+    )
+
+    image = models.ImageField(
+        upload_to="categories/",
+        blank=True,
+        null=True
+    )
 
     class Meta:
         verbose_name_plural = "Categories"
@@ -14,25 +26,62 @@ class Category(models.Model):
         return self.name
 
 
+# =========================================================
+# PRODUCT
+# =========================================================
+
 class Product(models.Model):
     category = models.ForeignKey(
         Category,
         on_delete=models.CASCADE,
         related_name="products"
     )
-    name = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=220, unique=True)
+
+    name = models.CharField(
+        max_length=200
+    )
+
+    slug = models.SlugField(
+        max_length=220,
+        unique=True
+    )
+
     description = models.TextField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    stock = models.PositiveIntegerField(default=0)
-    image = models.ImageField(upload_to="products/", blank=True, null=True)
-    is_available = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+
+    stock = models.PositiveIntegerField(
+        default=0
+    )
+
+    image = models.ImageField(
+        upload_to="products/",
+        blank=True,
+        null=True
+    )
+
+    is_available = models.BooleanField(
+        default=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
 
     def __str__(self):
         return self.name
 
+
+# =========================================================
+# ORDER
+# =========================================================
 
 class Order(models.Model):
 
@@ -63,14 +112,29 @@ class Order(models.Model):
         editable=False
     )
 
-    customer_name = models.CharField(max_length=200)
+    customer_name = models.CharField(
+        max_length=200
+    )
+
     customer_email = models.EmailField()
-    customer_phone = models.CharField(max_length=20)
+
+    customer_phone = models.CharField(
+        max_length=20
+    )
 
     address = models.TextField()
-    city = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
-    pincode = models.CharField(max_length=10)
+
+    city = models.CharField(
+        max_length=100
+    )
+
+    state = models.CharField(
+        max_length=100
+    )
+
+    pincode = models.CharField(
+        max_length=10
+    )
 
     subtotal = models.DecimalField(
         max_digits=10,
@@ -100,11 +164,16 @@ class Order(models.Model):
         default="pending"
     )
 
+    payment_id = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True
+    )
+
     razorpay_order_id = models.CharField(
         max_length=100,
         blank=True,
-        null=True,
-        unique=True
+        null=True
     )
 
     razorpay_payment_id = models.CharField(
@@ -119,21 +188,34 @@ class Order(models.Model):
         default="pending"
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
 
     class Meta:
         ordering = ["-created_at"]
 
     def save(self, *args, **kwargs):
+
         if not self.order_number:
-            self.order_number = "GRD-" + uuid.uuid4().hex[:10].upper()
+            self.order_number = (
+                "GRD-"
+                + uuid.uuid4().hex[:10].upper()
+            )
 
         super().save(*args, **kwargs)
 
     def __str__(self):
         return self.order_number
 
+
+# =========================================================
+# ORDER ITEM
+# =========================================================
 
 class OrderItem(models.Model):
 
@@ -150,7 +232,9 @@ class OrderItem(models.Model):
         blank=True
     )
 
-    product_name = models.CharField(max_length=200)
+    product_name = models.CharField(
+        max_length=200
+    )
 
     price = models.DecimalField(
         max_digits=10,
@@ -165,8 +249,15 @@ class OrderItem(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        self.total = self.price * self.quantity
+
+        self.total = (
+            self.price * self.quantity
+        )
+
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.product_name} x {self.quantity}"
+        return (
+            f"{self.product_name} "
+            f"x {self.quantity}"
+        )
