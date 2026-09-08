@@ -6,14 +6,10 @@ import razorpay
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from django.core.mail import send_mail, get_connection
+from django.core.mail import send_mail
 from django.db import transaction
 from django.db.models import Q
-from django.shortcuts import (
-    render,
-    get_object_or_404,
-    redirect,
-)
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
@@ -25,364 +21,74 @@ from .models import Product, Category, Order, OrderItem
 # =========================================================
 
 def get_razorpay_client():
-
-    key_id = os.environ.get(
-        "RAZORPAY_KEY_ID"
-    )
-
-    key_secret = os.environ.get(
-        "RAZORPAY_KEY_SECRET"
-    )
+    key_id = os.environ.get("RAZORPAY_KEY_ID")
+    key_secret = os.environ.get("RAZORPAY_KEY_SECRET")
 
     if not key_id or not key_secret:
-        raise ValueError(
-            "RAZORPAY_KEY_ID or "
-            "RAZORPAY_KEY_SECRET is missing."
+        raise RuntimeError(
+            "RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET are missing."
         )
 
     return razorpay.Client(
-        auth=(
-            key_id,
-            key_secret
-        )
+        auth=(key_id, key_secret)
     )
 
 
 # =========================================================
-# EMAIL CONNECTION
+# CART HELPER
 # =========================================================
 
-def get_email_connection():
+def get_cart_items(request):
 
-    try:
-        return get_connection(
-            fail_silently=True,
-            timeout=5,
-        )
-    except Exception as e:
-        print(
-            "EMAIL CONNECTION ERROR:",
-            e
-        )
-        return None
+    cart_data = request.session.get("cart", {})
 
+    if not cart_data:
+        return [], Decimal("0.00")
 
-# =========================================================
-# ORDER PLACED EMAILS
-# =========================================================
+    product_ids = cart_data.keys()
 
-def send_order_emails(order):
-
-    from_email = (
-        os.environ.get(
-            "DEFAULT_FROM_EMAIL"
-        )
-        or os.environ.get(
-            "EMAIL_HOST_USER"
-        )
+    products = Product.objects.filter(
+        id__in=product_ids,
+        is_available=True
     )
 
-    admin_email = os.environ.get(
-        "ADMIN_EMAIL"
-    )
+    cart_items = []
+    total = Decimal("0.00")
 
-    if not from_email:
-        print(
-            "ORDER EMAIL SKIPPED: "
-            "DEFAULT_FROM_EMAIL / EMAIL_HOST_USER missing."
-        )
-        return
+    cleaned_cart = {}
 
-    connection = get_email_connection()
-
-    if connection is None:
-        print(
-            "ORDER EMAIL SKIPPED: "
-            "Could not create email connection."
-        )
-        return
-
-    # -----------------------------------------------------
-    # ITEMS
-    # -----------------------------------------------------
-
-    items_text = []
-
-    for item in order.items.all():
-
-        items_text.append(
-            f"{item.product_name} "
-            f"x {item.quantity} "
-            f"= ₹{item.total}"
-        )
-
-    items_text = "\n".join(
-        items_text
-    )
-
-    # -----------------------------------------------------
-    # CUSTOMER EMAIL
-    # -----------------------------------------------------
-
-    customer_subject = (
-        f"Order Placed - "
-        f"{order.order_number} - "
-        f"ShopEasy Garden"
-    )
-
-    customer_message = (
-        f"Hello {order.customer_name},\n\n"
-
-        f"Thank you for shopping with "
-        f"ShopEasy Garden.\n\n"
-
-        f"Your order has been successfully "
-        f"placed and payment has been received.\n\n"
-
-        f"Order Number: "
-        f"{order.order_number}\n"
-
-        f"Order Status: "
-        f"{order.get_status_display()}\n"
-
-        f"Payment Status: "
-        f"{order.get_payment_status_display()}\n"
-
-        f"Payment ID: "
-        f"{order.razorpay_payment_id or order.payment_id or 'N/A'}\n"
-
-        f"Total Amount: "
-        f"₹{order.total_amount}\n\n"
-
-        f"Items:\n"
-        f"{items_text}\n\n"
-
-        f"Delivery Address:\n"
-        f"{order.address}\n"
-        f"{order.city}, "
-        f"{order.state} - "
-        f"{order.pincode}\n\n"
-
-        f"We will update you when your order "
-        f"is delivered.\n\n"
-
-        f"Thank you,\n"
-        f"ShopEasy Garden"
-    )
-
-    try:
-
-        if order.customer_email:
-
-            send_mail(
-                subject=customer_subject,
-                message=customer_message,
-                from_email=from_email,
-                recipient_list=[
-                    order.customer_email
-                ],
-                fail_silently=True,
-                connection=connection,
-            )
-
-    except Exception as e:
-
-        print(
-            "CUSTOMER ORDER EMAIL ERROR:",
-            e
-        )
-
-    # -----------------------------------------------------
-    # ADMIN EMAIL
-    # -----------------------------------------------------
-
-    if admin_email:
-
-        admin_subject = (
-            f"New Order - "
-            f"{order.order_number} - "
-            f"ShopEasy Garden"
-        )
-
-        admin_message = (
-            f"New order received.\n\n"
-
-            f"Order Number: "
-            f"{order.order_number}\n"
-
-            f"Customer: "
-            f"{order.customer_name}\n"
-
-            f"Email: "
-            f"{order.customer_email}\n"
-
-            f"Phone: "
-            f"{order.customer_phone}\n\n"
-
-            f"Address:\n"
-            f"{order.address}\n"
-            f"{order.city}, "
-            f"{order.state} - "
-            f"{order.pincode}\n\n"
-
-            f"Total Amount: "
-            f"₹{order.total_amount}\n"
-
-            f"Payment Method: "
-            f"{order.get_payment_method_display()}\n"
-
-            f"Payment Status: "
-            f"{order.get_payment_status_display()}\n"
-
-            f"Payment ID: "
-            f"{order.razorpay_payment_id or order.payment_id or 'N/A'}\n"
-
-            f"Order Status: "
-            f"{order.get_status_display()}\n\n"
-
-            f"Items:\n"
-            f"{items_text}\n"
-        )
+    for product in products:
 
         try:
+            quantity = int(cart_data.get(str(product.id), 0))
+        except (TypeError, ValueError):
+            quantity = 0
 
-            send_mail(
-                subject=admin_subject,
-                message=admin_message,
-                from_email=from_email,
-                recipient_list=[
-                    admin_email
-                ],
-                fail_silently=True,
-                connection=connection,
-            )
+        if quantity <= 0:
+            continue
 
-        except Exception as e:
+        # Never allow cart quantity above stock
+        quantity = min(quantity, product.stock)
 
-            print(
-                "ADMIN ORDER EMAIL ERROR:",
-                e
-            )
+        if quantity <= 0:
+            continue
 
+        item_total = product.price * quantity
+        total += item_total
 
-# =========================================================
-# DELIVERY EMAIL
-# =========================================================
+        cleaned_cart[str(product.id)] = quantity
 
-def send_delivery_email(order):
+        cart_items.append({
+            "product": product,
+            "quantity": quantity,
+            "total": item_total,
+        })
 
-    from_email = (
-        os.environ.get(
-            "DEFAULT_FROM_EMAIL"
-        )
-        or os.environ.get(
-            "EMAIL_HOST_USER"
-        )
-    )
+    if cleaned_cart != cart_data:
+        request.session["cart"] = cleaned_cart
+        request.session.modified = True
 
-    if not from_email:
-        print(
-            "DELIVERY EMAIL SKIPPED: "
-            "DEFAULT_FROM_EMAIL / EMAIL_HOST_USER missing."
-        )
-        return False
-
-    if not order.customer_email:
-        print(
-            "DELIVERY EMAIL SKIPPED: "
-            "Customer email missing."
-        )
-        return False
-
-    connection = get_email_connection()
-
-    if connection is None:
-        return False
-
-    items_text = []
-
-    for item in order.items.all():
-
-        items_text.append(
-            f"{item.product_name} "
-            f"x {item.quantity} "
-            f"= ₹{item.total}"
-        )
-
-    items_text = "\n".join(
-        items_text
-    )
-
-    subject = (
-        f"Order Delivered - "
-        f"{order.order_number} - "
-        f"ShopEasy Garden"
-    )
-
-    message = (
-        f"Hello {order.customer_name},\n\n"
-
-        f"Great news!\n\n"
-
-        f"Your ShopEasy Garden order has "
-        f"been marked as DELIVERED.\n\n"
-
-        f"Order Number: "
-        f"{order.order_number}\n"
-
-        f"Order Status: "
-        f"Delivered\n"
-
-        f"Payment Status: "
-        f"{order.get_payment_status_display()}\n"
-
-        f"Total Amount: "
-        f"₹{order.total_amount}\n\n"
-
-        f"Items:\n"
-        f"{items_text}\n\n"
-
-        f"Delivery Address:\n"
-        f"{order.address}\n"
-        f"{order.city}, "
-        f"{order.state} - "
-        f"{order.pincode}\n\n"
-
-        f"Thank you for shopping with "
-        f"ShopEasy Garden.\n\n"
-
-        f"Regards,\n"
-        f"ShopEasy Garden"
-    )
-
-    try:
-
-        send_mail(
-            subject=subject,
-            message=message,
-            from_email=from_email,
-            recipient_list=[
-                order.customer_email
-            ],
-            fail_silently=True,
-            connection=connection,
-        )
-
-        print(
-            f"DELIVERY EMAIL SENT: "
-            f"{order.order_number}"
-        )
-
-        return True
-
-    except Exception as e:
-
-        print(
-            "DELIVERY EMAIL ERROR:",
-            e
-        )
-
-        return False
+    return cart_items, total
 
 
 # =========================================================
@@ -392,23 +98,11 @@ def send_delivery_email(order):
 def home(request):
 
     products = Product.objects.filter(
-        is_available=True
-    )
+        is_available=True,
+        stock__gt=0
+    ).order_by("-created_at")
 
     categories = Category.objects.all()
-
-    query = request.GET.get(
-        "q",
-        ""
-    ).strip()
-
-    if query:
-
-        products = products.filter(
-            Q(name__icontains=query)
-            |
-            Q(description__icontains=query)
-        )
 
     return render(
         request,
@@ -416,7 +110,6 @@ def home(request):
         {
             "products": products,
             "categories": categories,
-            "query": query,
         }
     )
 
@@ -456,66 +149,42 @@ def add_to_cart(request, product_id):
     )
 
     try:
-
-        quantity = int(
-            request.POST.get(
-                "quantity",
-                1
-            )
-        )
-
-    except (
-        ValueError,
-        TypeError
-    ):
-
+        quantity = int(request.POST.get("quantity", 1))
+    except (TypeError, ValueError):
         quantity = 1
 
     if quantity < 1:
         quantity = 1
 
-    if product.stock < 1:
-
+    if product.stock <= 0:
         messages.error(
             request,
-            "This product is out of stock."
+            "Sorry, this product is out of stock."
         )
+        return redirect("product_detail", slug=product.slug)
 
-        return redirect(
-            "all_products"
-        )
+    quantity = min(quantity, product.stock)
 
-    cart = request.session.get(
-        "cart",
-        {}
-    )
-
-    product_id = str(
-        product.id
-    )
+    cart = request.session.get("cart", {})
 
     current_quantity = int(
-        cart.get(
-            product_id,
-            0
-        )
+        cart.get(str(product.id), 0)
     )
 
-    new_quantity = (
-        current_quantity
-        + quantity
+    new_quantity = min(
+        current_quantity + quantity,
+        product.stock
     )
 
-    if new_quantity > product.stock:
-
-        new_quantity = (
-            product.stock
-        )
-
-    cart[product_id] = new_quantity
+    cart[str(product.id)] = new_quantity
 
     request.session["cart"] = cart
     request.session.modified = True
+
+    messages.success(
+        request,
+        f"{product.name} added to cart."
+    )
 
     return redirect("cart")
 
@@ -526,58 +195,7 @@ def add_to_cart(request, product_id):
 
 def cart(request):
 
-    cart_data = request.session.get(
-        "cart",
-        {}
-    )
-
-    products = Product.objects.filter(
-        id__in=cart_data.keys(),
-        is_available=True
-    )
-
-    cart_items = []
-
-    total = Decimal("0.00")
-
-    for product in products:
-
-        quantity = int(
-            cart_data.get(
-                str(product.id),
-                0
-            )
-        )
-
-        if quantity <= 0:
-            continue
-
-        if quantity > product.stock:
-
-            quantity = product.stock
-
-            cart_data[
-                str(product.id)
-            ] = quantity
-
-        if quantity <= 0:
-            continue
-
-        item_total = (
-            product.price
-            * quantity
-        )
-
-        total += item_total
-
-        cart_items.append({
-            "product": product,
-            "quantity": quantity,
-            "item_total": item_total,
-        })
-
-    request.session["cart"] = cart_data
-    request.session.modified = True
+    cart_items, total = get_cart_items(request)
 
     return render(
         request,
@@ -594,65 +212,33 @@ def cart(request):
 # =========================================================
 
 @require_POST
-def update_cart(
-    request,
-    product_id
-):
-
-    try:
-
-        quantity = int(
-            request.POST.get(
-                "quantity",
-                1
-            )
-        )
-
-    except (
-        ValueError,
-        TypeError
-    ):
-
-        quantity = 1
-
-    cart = request.session.get(
-        "cart",
-        {}
-    )
-
-    product_id = str(
-        product_id
-    )
+def update_cart(request, product_id):
 
     product = get_object_or_404(
         Product,
-        id=product_id
+        id=product_id,
+        is_available=True
     )
 
-    if quantity <= 0:
-
-        cart.pop(
-            product_id,
-            None
+    try:
+        quantity = int(
+            request.POST.get("quantity", 1)
         )
+    except (TypeError, ValueError):
+        quantity = 1
+
+    cart = request.session.get("cart", {})
+
+    if quantity <= 0:
+        cart.pop(str(product.id), None)
 
     else:
-
-        quantity = min(
-            quantity,
-            product.stock
-        )
+        quantity = min(quantity, product.stock)
 
         if quantity > 0:
-
-            cart[product_id] = quantity
-
+            cart[str(product.id)] = quantity
         else:
-
-            cart.pop(
-                product_id,
-                None
-            )
+            cart.pop(str(product.id), None)
 
     request.session["cart"] = cart
     request.session.modified = True
@@ -665,20 +251,11 @@ def update_cart(
 # =========================================================
 
 @require_POST
-def remove_from_cart(
-    request,
-    product_id
-):
+def remove_from_cart(request, product_id):
 
-    cart = request.session.get(
-        "cart",
-        {}
-    )
+    cart = request.session.get("cart", {})
 
-    cart.pop(
-        str(product_id),
-        None
-    )
+    cart.pop(str(product_id), None)
 
     request.session["cart"] = cart
     request.session.modified = True
@@ -698,27 +275,22 @@ def all_products(request):
 
     categories = Category.objects.all()
 
-    query = request.GET.get(
-        "q",
-        ""
-    ).strip()
-
+    query = request.GET.get("q", "").strip()
     category_slug = request.GET.get(
         "category",
         ""
-    )
+    ).strip()
 
     sort = request.GET.get(
         "sort",
-        ""
+        "newest"
     )
 
     if query:
 
         products = products.filter(
             Q(name__icontains=query)
-            |
-            Q(description__icontains=query)
+            | Q(description__icontains=query)
         )
 
     if category_slug:
@@ -727,23 +299,17 @@ def all_products(request):
             category__slug=category_slug
         )
 
-    if sort == "price_asc":
+    if sort == "price_low":
+        products = products.order_by("price")
 
-        products = products.order_by(
-            "price"
-        )
+    elif sort == "price_high":
+        products = products.order_by("-price")
 
-    elif sort == "price_desc":
+    elif sort == "name":
+        products = products.order_by("name")
 
-        products = products.order_by(
-            "-price"
-        )
-
-    elif sort == "newest":
-
-        products = products.order_by(
-            "-created_at"
-        )
+    else:
+        products = products.order_by("-created_at")
 
     return render(
         request,
@@ -752,6 +318,8 @@ def all_products(request):
             "products": products,
             "categories": categories,
             "query": query,
+            "category": category_slug,
+            "sort": sort,
         }
     )
 
@@ -762,63 +330,14 @@ def all_products(request):
 
 def checkout(request):
 
-    cart_data = request.session.get(
-        "cart",
-        {}
-    )
-
-    if not cart_data:
-
-        return redirect("cart")
-
-    products = Product.objects.filter(
-        id__in=cart_data.keys(),
-        is_available=True
-    )
-
-    cart_items = []
-
-    total = Decimal("0.00")
-
-    for product in products:
-
-        quantity = int(
-            cart_data.get(
-                str(product.id),
-                0
-            )
-        )
-
-        if quantity <= 0:
-            continue
-
-        if quantity > product.stock:
-
-            quantity = product.stock
-
-        if quantity <= 0:
-            continue
-
-        item_total = (
-            product.price
-            * quantity
-        )
-
-        total += item_total
-
-        cart_items.append({
-            "product": product,
-            "quantity": quantity,
-            "item_total": item_total,
-        })
+    cart_items, total = get_cart_items(request)
 
     if not cart_items:
-
+        messages.warning(
+            request,
+            "Your cart is empty."
+        )
         return redirect("cart")
-
-    # -----------------------------------------------------
-    # POST = CREATE RAZORPAY ORDER
-    # -----------------------------------------------------
 
     if request.method == "POST":
 
@@ -852,14 +371,11 @@ def checkout(request):
             ""
         ).strip()
 
-        pin_code = request.POST.get(
-            "pincode",
-            ""
-        ).strip()
+        pin_code = request.POST.get("pincode", "").strip()
 
-        # -------------------------------------------------
-        # REQUIRED FIELDS
-        # -------------------------------------------------
+        # -------------------------
+        # Required fields
+        # -------------------------
 
         if not all([
             full_name,
@@ -885,14 +401,12 @@ def checkout(request):
                 }
             )
 
-        # -------------------------------------------------
-        # EMAIL VALIDATION
-        # -------------------------------------------------
+        # -------------------------
+        # Email validation
+        # -------------------------
 
         try:
-
             validate_email(email)
-
         except ValidationError:
 
             messages.error(
@@ -909,67 +423,39 @@ def checkout(request):
                 }
             )
 
-        # -------------------------------------------------
-        # RAZORPAY CONFIG
-        # -------------------------------------------------
-
-        key_id = os.environ.get(
-            "RAZORPAY_KEY_ID"
-        )
-
-        key_secret = os.environ.get(
-            "RAZORPAY_KEY_SECRET"
-        )
-
-        if not key_id or not key_secret:
-
-            messages.error(
-                request,
-                "Razorpay configuration is missing."
-            )
-
-            return render(
-                request,
-                "store/checkout.html",
-                {
-                    "cart_items": cart_items,
-                    "total": total,
-                }
-            )
-
-        # -------------------------------------------------
-        # CREATE RAZORPAY ORDER
-        # -------------------------------------------------
+        # -------------------------
+        # Razorpay
+        # -------------------------
 
         try:
 
             client = get_razorpay_client()
 
-            razorpay_order = (
-                client.order.create({
-                    "amount": int(
-                        total * 100
-                    ),
-                    "currency": "INR",
-                    "receipt": (
-                        f"grd_"
-                        f"{request.session.session_key}"
-                    ),
-                    "payment_capture": 1,
-                })
+            amount_paise = int(
+                total * Decimal("100")
             )
+
+            if not request.session.session_key:
+                request.session.create()
+
+            receipt = (
+                f"grd_{request.session.session_key}"
+            )
+
+            razorpay_order = client.order.create({
+                "amount": amount_paise,
+                "currency": "INR",
+                "receipt": receipt,
+                "payment_capture": 1,
+            })
 
         except Exception as e:
 
-            print(
-                "RAZORPAY ORDER ERROR:",
-                e
-            )
+            print("RAZORPAY ORDER ERROR:", e)
 
             messages.error(
                 request,
-                "Unable to start payment. "
-                "Please try again."
+                "Unable to start payment. Please try again."
             )
 
             return render(
@@ -981,93 +467,70 @@ def checkout(request):
                 }
             )
 
-        # -------------------------------------------------
-        # CREATE LOCAL ORDER
-        # -------------------------------------------------
+        # -------------------------
+        # Create local order
+        # -------------------------
 
-        order = Order.objects.create(
+        try:
 
-            customer_name=full_name,
+            with transaction.atomic():
 
-            customer_email=email,
+                order = Order.objects.create(
+                    customer_name=full_name,
+                    customer_email=email,
+                    customer_phone=phone,
+                    address=address,
+                    city=city,
+                    state=state,
+                    pincode=pin_code,
+                    subtotal=total,
+                    shipping_charge=Decimal("0.00"),
+                    total_amount=total,
+                    payment_method="online",
+                    payment_status="pending",
+                    status="pending",
+                    razorpay_order_id=razorpay_order["id"],
+                )
 
-            customer_phone=phone,
+                for item in cart_items:
 
-            address=address,
+                    OrderItem.objects.create(
+                        order=order,
+                        product=item["product"],
+                        product_name=item["product"].name,
+                        price=item["product"].price,
+                        quantity=item["quantity"],
+                        total=item["total"],
+                    )
 
-            city=city,
+        except Exception as e:
 
-            state=state,
+            print("ORDER CREATE ERROR:", e)
 
-            pincode=pin_code,
-
-            subtotal=total,
-
-            shipping_charge=Decimal(
-                "0.00"
-            ),
-
-            total_amount=total,
-
-            payment_method="online",
-
-            payment_status="pending",
-
-            status="pending",
-
-            razorpay_order_id=(
-                razorpay_order["id"]
-            ),
-        )
-
-        # -------------------------------------------------
-        # CREATE ORDER ITEMS
-        # -------------------------------------------------
-
-        for item in cart_items:
-
-            OrderItem.objects.create(
-
-                order=order,
-
-                product=item["product"],
-
-                product_name=(
-                    item["product"].name
-                ),
-
-                price=(
-                    item["product"].price
-                ),
-
-                quantity=item["quantity"],
-
-                total=item["item_total"],
+            messages.error(
+                request,
+                "Unable to create order. Please try again."
             )
+
+            return redirect("checkout")
+
+        # -------------------------
+        # Payment page
+        # -------------------------
 
         return render(
             request,
             "store/payment.html",
             {
                 "order": order,
-
-                "razorpay_order_id": (
-                    razorpay_order["id"]
+                "razorpay_order_id": razorpay_order["id"],
+                "razorpay_key_id": os.environ.get(
+                    "RAZORPAY_KEY_ID"
                 ),
-
-                "razorpay_key_id": key_id,
-
-                "amount": int(
-                    total * 100
-                ),
-
+                "amount": int(total * Decimal("100")),
                 "total": total,
             }
         )
-
-    # -----------------------------------------------------
-    # GET CHECKOUT
-    # -----------------------------------------------------
 
     return render(
         request,
@@ -1077,6 +540,139 @@ def checkout(request):
             "total": total,
         }
     )
+
+
+# =========================================================
+# SEND ORDER EMAILS
+# =========================================================
+
+def send_order_emails(order):
+
+    from_email = (
+        os.environ.get("DEFAULT_FROM_EMAIL")
+        or os.environ.get("EMAIL_HOST_USER")
+    )
+
+    admin_email = os.environ.get(
+        "ADMIN_EMAIL"
+    )
+
+    if not from_email:
+        print(
+            "EMAIL NOT SENT: DEFAULT_FROM_EMAIL missing."
+        )
+        return
+
+    items_text = []
+
+    for item in order.items.all():
+
+        items_text.append(
+            f"- {item.product_name} "
+            f"x {item.quantity} = "
+            f"₹{item.total}"
+        )
+
+    items_text = "\n".join(items_text)
+
+    customer_subject = (
+        f"ShopEasy Garden - Order "
+        f"{order.order_number} Confirmed"
+    )
+
+    customer_message = f"""
+Hello {order.customer_name},
+
+Thank you for your order from ShopEasy Garden.
+
+Your order has been successfully confirmed.
+
+Order Number: {order.order_number}
+Payment ID: {order.razorpay_payment_id}
+Total Amount: ₹{order.total_amount}
+
+Items:
+{items_text}
+
+Shipping Address:
+{order.address}
+{order.city}, {order.state} - {order.pincode}
+
+Thank you for shopping with ShopEasy Garden.
+"""
+
+    try:
+
+        send_mail(
+            customer_subject,
+            customer_message,
+            from_email,
+            [order.customer_email],
+            fail_silently=True,
+        )
+
+    except Exception as e:
+
+        print(
+            "CUSTOMER EMAIL ERROR:",
+            e
+        )
+
+    # -------------------------
+    # Admin email
+    # -------------------------
+
+    if admin_email:
+
+        admin_subject = (
+            f"New ShopEasy Garden Order - "
+            f"{order.order_number}"
+        )
+
+        admin_message = f"""
+New order received.
+
+Order Number: {order.order_number}
+
+Customer:
+{order.customer_name}
+
+Email:
+{order.customer_email}
+
+Phone:
+{order.customer_phone}
+
+Amount:
+₹{order.total_amount}
+
+Payment ID:
+{order.razorpay_payment_id}
+
+Items:
+{items_text}
+
+Address:
+{order.address}
+{order.city}, {order.state} - {order.pincode}
+"""
+
+        try:
+
+            send_mail(
+                admin_subject,
+                admin_message,
+                from_email,
+                [admin_email],
+                fail_silently=True,
+            )
+
+        except Exception as e:
+
+            print(
+                "ADMIN EMAIL ERROR:",
+                e
+            )
 
 
 # =========================================================
@@ -1099,236 +695,132 @@ def payment_success(request):
         "razorpay_signature"
     )
 
-    # -----------------------------------------------------
-    # REQUIRED RAZORPAY DATA
-    # -----------------------------------------------------
-
     if not all([
         razorpay_order_id,
         razorpay_payment_id,
         razorpay_signature,
     ]):
 
-        return redirect(
-            "payment_failed"
-        )
+        return redirect("payment_failed")
 
     try:
-
-        # -------------------------------------------------
-        # VERIFY PAYMENT
-        # -------------------------------------------------
 
         client = get_razorpay_client()
 
         client.utility.verify_payment_signature({
-            "razorpay_order_id": (
-                razorpay_order_id
-            ),
-
-            "razorpay_payment_id": (
-                razorpay_payment_id
-            ),
-
-            "razorpay_signature": (
-                razorpay_signature
-            ),
+            "razorpay_order_id": razorpay_order_id,
+            "razorpay_payment_id": razorpay_payment_id,
+            "razorpay_signature": razorpay_signature,
         })
 
-        # -------------------------------------------------
-        # GET ORDER
-        # -------------------------------------------------
+    except Exception as e:
 
-        order = get_object_or_404(
-            Order,
-            razorpay_order_id=(
-                razorpay_order_id
-            )
-        )
+        print("========== RAZORPAY SIGNATURE ERROR ==========")
+        print("ERROR:", repr(e))
+        print("ORDER ID:", razorpay_order_id)
+        print("PAYMENT ID:", razorpay_payment_id)
+        print("SIGNATURE:", razorpay_signature)
+        print("===============================================")
 
-        # -------------------------------------------------
-        # ALREADY PAID
-        # -------------------------------------------------
+        return redirect("payment_failed")
 
-        if order.payment_status == "paid":
-
-            request.session["cart"] = {}
-
-            request.session.modified = True
-
-            return redirect(
-                "order_success",
-                order_id=order.id
-            )
-
-        # -------------------------------------------------
-        # PAYMENT + STOCK UPDATE
-        # -------------------------------------------------
+    try:
 
         with transaction.atomic():
 
-            order = (
-                Order.objects
-                .select_for_update()
-                .get(
-                    pk=order.pk
-                )
+            order = Order.objects.select_for_update().get(
+                razorpay_order_id=razorpay_order_id
             )
 
-            # Another request may have
-            # completed the payment.
+            # Prevent duplicate stock deduction
+            if order.payment_status != "paid":
 
-            if order.payment_status == "paid":
-
-                request.session["cart"] = {}
-
-                request.session.modified = True
-
-                return redirect(
-                    "order_success",
-                    order_id=order.id
-                )
-
-            # -------------------------------------------------
-            # CHECK STOCK FIRST
-            # -------------------------------------------------
-
-            order_items = list(
-                order.items.select_related(
+                for item in order.items.select_related(
                     "product"
-                )
-            )
+                ):
 
-            for item in order_items:
+                    product = item.product
 
-                product = item.product
+                    if not product:
+                        continue
 
-                if not product:
-                    continue
+                    if product.stock < item.quantity:
 
-                if product.stock < item.quantity:
+                        raise ValueError(
+                            f"Insufficient stock for "
+                            f"{product.name}"
+                        )
 
-                    raise ValueError(
-                        f"Not enough stock for "
-                        f"{product.name}"
-                    )
+                # Deduct stock ONLY after successful payment
+                for item in order.items.select_related(
+                    "product"
+                ):
 
-            # -------------------------------------------------
-            # REDUCE STOCK
-            # -------------------------------------------------
+                    if item.product:
 
-            for item in order_items:
+                        item.product.stock -= item.quantity
 
-                product = item.product
+                        item.product.save(
+                            update_fields=[
+                                "stock",
+                                "updated_at",
+                            ]
+                        )
 
-                if not product:
-                    continue
-
-                product.stock -= (
-                    item.quantity
-                )
-
-                if product.stock <= 0:
-
-                    product.stock = 0
-
-                    product.is_available = False
-
-                product.save(
-                    update_fields=[
-                        "stock",
-                        "is_available",
-                        "updated_at",
-                    ]
+                order.razorpay_payment_id = (
+                    razorpay_payment_id
                 )
 
-            # -------------------------------------------------
-            # MARK ORDER CONFIRMED
-            # -------------------------------------------------
+                order.payment_status = "paid"
+                order.payment_method = "online"
+                order.status = "confirmed"
 
-            order.status = "confirmed"
+                order.save()
 
-            order.payment_status = "paid"
+            else:
 
-            order.payment_method = "online"
-
-            order.razorpay_payment_id = (
-                razorpay_payment_id
-            )
-
-            order.payment_id = (
-                razorpay_payment_id
-            )
-
-            order.save(
-                update_fields=[
-                    "status",
-                    "payment_status",
-                    "payment_method",
-                    "razorpay_payment_id",
-                    "payment_id",
-                    "updated_at",
-                ]
-            )
-
-        # -----------------------------------------------------
-        # PAYMENT IS NOW SUCCESSFUL
-        # -----------------------------------------------------
-        #
-        # Email failure MUST NOT change
-        # successful payment into failed payment.
-        # -----------------------------------------------------
-
-        try:
-
-            send_order_emails(
-                order
-            )
-
-        except Exception as e:
-
-            print(
-                "ORDER EMAIL ERROR:",
-                e
-            )
-
-        # -----------------------------------------------------
-        # CLEAR CART
-        # -----------------------------------------------------
-
-        request.session["cart"] = {}
-
-        request.session.modified = True
-
-        # -----------------------------------------------------
-        # SUCCESS PAGE
-        # -----------------------------------------------------
-
-        return redirect(
-            "order_success",
-            order_id=order.id
-        )
+                # Already processed payment
+                pass
 
     except Exception as e:
 
         print(
-            "PAYMENT ERROR:",
+            "PAYMENT PROCESSING ERROR:",
             e
         )
 
-        return redirect(
-            "payment_failed"
+        return redirect("payment_failed")
+
+    # -------------------------
+    # Email after successful payment
+    # -------------------------
+
+    try:
+        send_order_emails(order)
+    except Exception as e:
+        print(
+            "EMAIL PROCESS ERROR:",
+            e
         )
+
+    # -------------------------
+    # Clear cart ONLY after payment
+    # -------------------------
+
+    request.session["cart"] = {}
+    request.session.modified = True
+
+    return redirect(
+        "order_success",
+        order_id=order.id
+    )
 
 
 # =========================================================
 # ORDER SUCCESS
 # =========================================================
 
-def order_success(
-    request,
-    order_id
-):
+def order_success(request, order_id):
 
     order = get_object_or_404(
         Order,
@@ -1352,13 +844,13 @@ def payment_failed(request):
 
     reason = request.GET.get(
         "reason",
-        ""
+        "Payment could not be completed."
     )
 
     return render(
         request,
         "store/payment_failed.html",
         {
-            "reason": reason,
+            "reason": reason
         }
     )
