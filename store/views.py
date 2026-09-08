@@ -715,10 +715,12 @@ def payment_success(request):
 
     except Exception as e:
 
-        print(
-            "RAZORPAY SIGNATURE ERROR:",
-            e
-        )
+        print("========== RAZORPAY SIGNATURE ERROR ==========")
+        print("ERROR:", repr(e))
+        print("ORDER ID:", razorpay_order_id)
+        print("PAYMENT ID:", razorpay_payment_id)
+        print("SIGNATURE:", razorpay_signature)
+        print("===============================================")
 
         return redirect("payment_failed")
 
@@ -840,7 +842,15 @@ def order_success(request, order_id):
 
 def payment_failed(request):
 
+    reason = request.GET.get(
+        "reason",
+        "Payment could not be completed."
+    )
+
     return render(
         request,
-        "store/payment_failed.html"
+        "store/payment_failed.html",
+        {
+            "reason": reason
+        }
     )

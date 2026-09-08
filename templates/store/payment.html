@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Secure Payment - ShopEasy Garden</title>
 
@@ -20,7 +21,7 @@
             padding: 35px;
             border-radius: 12px;
             text-align: center;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
             width: 380px;
         }
 
@@ -43,100 +44,109 @@
 
 <body>
 
-<div class="payment-box">
+    <div class="payment-box">
 
-    <h2>Complete Payment</h2>
+        <h2>Complete Payment</h2>
 
-    <p>
-        Order:
-        <strong>{{ order.order_number }}</strong>
-    </p>
+        <p>
+            Order:
+            <strong>{{ order.order_number }}</strong>
+        </p>
 
-    <h3>
-        ₹{{ total }}
-    </h3>
+        <h3>
+            ₹{{ total }}
+        </h3>
 
-    <button id="pay-button">
-        Pay ₹{{ total }}
-    </button>
+        <button id="pay-button">
+            Pay ₹{{ total }}
+        </button>
 
-</div>
-
-
-<script>
-
-const options = {
-
-    key: "{{ razorpay_key_id }}",
-
-    amount: "{{ amount }}",
-
-    currency: "INR",
-
-    name: "ShopEasy Garden",
-
-    description: "Order {{ order.order_number }}",
-
-    order_id: "{{ razorpay_order_id }}",
-
-    handler: function (response) {
-
-        const form = document.createElement("form");
-
-        form.method = "POST";
-        form.action = "{% url 'payment_success' %}";
-
-        const orderId = document.createElement("input");
-        orderId.type = "hidden";
-        orderId.name = "razorpay_order_id";
-        orderId.value = response.razorpay_order_id;
-
-        const paymentId = document.createElement("input");
-        paymentId.type = "hidden";
-        paymentId.name = "razorpay_payment_id";
-        paymentId.value = response.razorpay_payment_id;
-
-        const signature = document.createElement("input");
-        signature.type = "hidden";
-        signature.name = "razorpay_signature";
-        signature.value = response.razorpay_signature;
-
-        form.appendChild(orderId);
-        form.appendChild(paymentId);
-        form.appendChild(signature);
-
-        document.body.appendChild(form);
-
-        form.submit();
-    },
-
-    theme: {
-        color: "#111111"
-    }
-};
+    </div>
 
 
-const rzp = new Razorpay(options);
+    <script>
+
+        const options = {
+
+            key: "{{ razorpay_key_id }}",
+
+            amount: "{{ amount }}",
+
+            currency: "INR",
+
+            name: "ShopEasy Garden",
+
+            description: "Order {{ order.order_number }}",
+
+            order_id: "{{ razorpay_order_id }}",
+
+            handler: function (response) {
+
+                console.log("RAZORPAY SUCCESS RESPONSE:", response);
+
+                alert("Payment successful. Backend ko data bhej raha hoon...");
+
+                const form = document.createElement("form");
+
+                form.method = "POST";
+                form.action = "{% url 'payment_success' %}";
+
+                const orderId = document.createElement("input");
+                orderId.type = "hidden";
+                orderId.name = "razorpay_order_id";
+                orderId.value = response.razorpay_order_id;
+
+                const paymentId = document.createElement("input");
+                paymentId.type = "hidden";
+                paymentId.name = "razorpay_payment_id";
+                paymentId.value = response.razorpay_payment_id;
+
+                const signature = document.createElement("input");
+                signature.type = "hidden";
+                signature.name = "razorpay_signature";
+                signature.value = response.razorpay_signature;
+
+                form.appendChild(orderId);
+                form.appendChild(paymentId);
+                form.appendChild(signature);
+
+                document.body.appendChild(form);
+
+                form.submit();
+            },
+
+            theme: {
+                color: "#111111"
+            }
+        };
 
 
-rzp.on("payment.failed", function (response) {
+        const rzp = new Razorpay(options);
 
-    window.location.href =
-        "{% url 'payment_failed' %}";
+        rzp.on("payment.failed", function (response) {
 
-});
+            console.error("RAZORPAY PAYMENT FAILED:", response);
 
+            alert(
+                "Payment failed: " +
+                (response.error?.description || "Unknown error")
+            );
 
-document.getElementById("pay-button")
-    .addEventListener("click", function (e) {
+            window.location.href =
+                "{% url 'payment_failed' %}";
+        });
 
-        rzp.open();
+        document.getElementById("pay-button")
+            .addEventListener("click", function (e) {
 
-        e.preventDefault();
+                rzp.open();
 
-    });
+                e.preventDefault();
 
-</script>
+            });
+
+    </script>
 
 </body>
+
 </html>
