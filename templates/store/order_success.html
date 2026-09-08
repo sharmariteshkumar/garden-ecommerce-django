@@ -10,10 +10,10 @@
 
     <h1>🎉 Order Placed Successfully!</h1>
 
-    <h2>Order #{{ order.id }}</h2>
+    <h2>Order #{{ order.order_number }}</h2>
 
     <p>
-        Thank you, {{ order.full_name }}.
+        Thank you, {{ order.customer_name }}.
     </p>
 
     <p>
@@ -23,10 +23,10 @@
 
     <p>
         Confirmation email has been sent to
-        <strong>{{ order.email }}</strong>.
+        <strong>{{ order.customer_email }}</strong>.
     </p>
 
-    <a href="{% url 'home' %}">
+    <a href="{% url 'store_home' %}">
         Continue Shopping
     </a>
 
