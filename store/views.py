@@ -853,7 +853,7 @@ def checkout(request):
         ).strip()
 
         pin_code = request.POST.get(
-            "pin_code",
+            "pincode",
             ""
         ).strip()
 
