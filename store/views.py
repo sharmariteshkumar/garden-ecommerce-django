@@ -778,22 +778,6 @@ def payment_success(request):
 
                 order.save()
                 
-            if order.email:
-                subject = f"Order Confirmation - #{order.id}"
-                message = (
-                    f"Hello {order.name},\n\n"
-                    f"Thank you for your order! Your order #{order.id} has been placed successfully.\n\n"
-                    f"Total Amount: ₹{order.total_price}\n\n"
-                    f"We will update you once it is dispatched."
-                )
-    
-                send_mail(
-                    subject=subject,
-                    message=message,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[order.email],
-                    fail_silently=True,
-                )
 
             else:
 

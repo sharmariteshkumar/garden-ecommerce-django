@@ -178,17 +178,17 @@ class OrderItem(models.Model):
 @receiver(pre_save, sender=Order)
 def notify_delivery_status(sender, instance, **kwargs):
     if not instance.pk:
-        return  # Direct naya order banne par email na jaye (wo views se jata hai)
+        return  # Naya order banne par email nahi bhejna
 
     try:
         old_order = Order.objects.get(pk=instance.pk)
-        # Check karein ki Admin ne status badal kar 'Delivered' kiya hai ya nahi
-        if old_order.status != 'Delivered' and instance.status == 'Delivered':
-            if instance.email:
-                subject = f"Order Delivered - #{instance.id}"
+        # Status badal kar 'delivered' hone par (dhyan de model me choice small 'delivered' hai)
+        if old_order.status != 'delivered' and instance.status == 'delivered':
+            if instance.customer_email:
+                subject = f"Order Delivered - #{instance.order_number}"
                 message = (
-                    f"Hello {instance.name},\n\n"
-                    f"Great news! Your order #{instance.id} has been successfully delivered.\n\n"
+                    f"Hello {instance.customer_name},\n\n"
+                    f"Great news! Your order #{instance.order_number} has been successfully delivered.\n\n"
                     f"Thank you for shopping with us!"
                 )
                 
@@ -196,7 +196,7 @@ def notify_delivery_status(sender, instance, **kwargs):
                     subject=subject,
                     message=message,
                     from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[instance.email],
+                    recipient_list=[instance.customer_email],
                     fail_silently=True,
                 )
     except Order.DoesNotExist:
