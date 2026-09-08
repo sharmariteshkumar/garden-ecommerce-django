@@ -310,7 +310,7 @@ def place_order(request):
         order_number=order.order_number
     )
     
-    @transaction.atomic
+@transaction.atomic
 def checkout(request):
     cart_data = request.session.get("cart", {})
 
@@ -326,9 +326,7 @@ def checkout(request):
     subtotal = Decimal("0.00")
 
     for product in products:
-        quantity = int(
-            cart_data.get(str(product.id), 0)
-        )
+        quantity = int(cart_data.get(str(product.id), 0))
 
         if quantity <= 0:
             continue
@@ -348,15 +346,11 @@ def checkout(request):
             "item_total": item_total,
         })
 
-    return render(
-        request,
-        "store/checkout.html",
-        {
-            "cart_items": cart_items,
-            "subtotal": subtotal,
-            "total": subtotal,
-        }
-    )
+    return render(request, "store/checkout.html", {
+        "cart_items": cart_items,
+        "subtotal": subtotal,
+        "total": subtotal,
+    })
 
 
 @require_POST
