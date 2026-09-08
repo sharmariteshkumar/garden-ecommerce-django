@@ -4,7 +4,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_POST
 from django.db.models import Q
 
-from .models import Product, Category
+from django.db import transaction
+from .models import Product, Category, Order, OrderItem
 
 
 def home(request):
@@ -179,3 +180,308 @@ def all_products(request):
         'categories': categories,
     }
     return render(request, 'store/all_products.html', context)
+
+@require_POST
+@transaction.atomic
+def place_order(request):
+
+    cart_data = request.session.get("cart", {})
+
+    if not cart_data:
+        return redirect("cart")
+
+    customer_name = request.POST.get("customer_name", "").strip()
+    customer_email = request.POST.get("customer_email", "").strip()
+    customer_phone = request.POST.get("customer_phone", "").strip()
+
+    address = request.POST.get("address", "").strip()
+    city = request.POST.get("city", "").strip()
+    state = request.POST.get("state", "").strip()
+    pincode = request.POST.get("pincode", "").strip()
+
+    payment_method = request.POST.get(
+        "payment_method",
+        "cod"
+    )
+
+    if not all([
+        customer_name,
+        customer_email,
+        customer_phone,
+        address,
+        city,
+        state,
+        pincode,
+    ]):
+        return redirect("cart")
+
+    products = Product.objects.filter(
+        id__in=cart_data.keys(),
+        is_available=True
+    )
+
+    subtotal = Decimal("0.00")
+    order_items = []
+
+    for product in products:
+
+        quantity = int(
+            cart_data.get(str(product.id), 0)
+        )
+
+        if quantity <= 0:
+            continue
+
+        # Stock dobara check
+        if quantity > product.stock:
+            quantity = product.stock
+
+        if quantity <= 0:
+            continue
+
+        item_total = product.price * quantity
+        subtotal += item_total
+
+        order_items.append({
+            "product": product,
+            "quantity": quantity,
+            "price": product.price,
+            "total": item_total,
+        })
+
+    if not order_items:
+        return redirect("cart")
+
+    # Abhi simple shipping
+    shipping_charge = Decimal("0.00")
+
+    total_amount = subtotal + shipping_charge
+
+    # Order create
+    order = Order.objects.create(
+        customer_name=customer_name,
+        customer_email=customer_email,
+        customer_phone=customer_phone,
+        address=address,
+        city=city,
+        state=state,
+        pincode=pincode,
+        subtotal=subtotal,
+        shipping_charge=shipping_charge,
+        total_amount=total_amount,
+        payment_method=payment_method,
+        payment_status="pending",
+        status="pending",
+    )
+
+    # Order items create + stock reduce
+    for item in order_items:
+
+        OrderItem.objects.create(
+            order=order,
+            product=item["product"],
+            product_name=item["product"].name,
+            price=item["price"],
+            quantity=item["quantity"],
+            total=item["total"],
+        )
+
+        product = item["product"]
+
+        product.stock -= item["quantity"]
+
+        if product.stock <= 0:
+            product.stock = 0
+            product.is_available = False
+
+        product.save(
+            update_fields=[
+                "stock",
+                "is_available",
+            ]
+        )
+
+    # Cart clear
+    request.session["cart"] = {}
+    request.session.modified = True
+
+    return redirect(
+        "order_success",
+        order_number=order.order_number
+    )
+    
+    @transaction.atomic
+def checkout(request):
+    cart_data = request.session.get("cart", {})
+
+    if not cart_data:
+        return redirect("cart")
+
+    products = Product.objects.filter(
+        id__in=cart_data.keys(),
+        is_available=True
+    )
+
+    cart_items = []
+    subtotal = Decimal("0.00")
+
+    for product in products:
+        quantity = int(
+            cart_data.get(str(product.id), 0)
+        )
+
+        if quantity <= 0:
+            continue
+
+        if quantity > product.stock:
+            quantity = product.stock
+
+        if quantity <= 0:
+            continue
+
+        item_total = product.price * quantity
+        subtotal += item_total
+
+        cart_items.append({
+            "product": product,
+            "quantity": quantity,
+            "item_total": item_total,
+        })
+
+    return render(
+        request,
+        "store/checkout.html",
+        {
+            "cart_items": cart_items,
+            "subtotal": subtotal,
+            "total": subtotal,
+        }
+    )
+
+
+@require_POST
+@transaction.atomic
+def place_order(request):
+
+    cart_data = request.session.get("cart", {})
+
+    if not cart_data:
+        return redirect("cart")
+
+    products = Product.objects.filter(
+        id__in=cart_data.keys(),
+        is_available=True
+    )
+
+    customer_name = request.POST.get("customer_name", "").strip()
+    customer_email = request.POST.get("customer_email", "").strip()
+    customer_phone = request.POST.get("customer_phone", "").strip()
+    address = request.POST.get("address", "").strip()
+    city = request.POST.get("city", "").strip()
+    state = request.POST.get("state", "").strip()
+    pincode = request.POST.get("pincode", "").strip()
+
+    if not all([
+        customer_name,
+        customer_email,
+        customer_phone,
+        address,
+        city,
+        state,
+        pincode,
+    ]):
+        return redirect("checkout")
+
+    subtotal = Decimal("0.00")
+    items = []
+
+    for product in products:
+
+        quantity = int(
+            cart_data.get(str(product.id), 0)
+        )
+
+        if quantity <= 0:
+            continue
+
+        if quantity > product.stock:
+            return redirect("checkout")
+
+        item_total = product.price * quantity
+        subtotal += item_total
+
+        items.append({
+            "product": product,
+            "quantity": quantity,
+            "price": product.price,
+            "total": item_total,
+        })
+
+    if not items:
+        return redirect("cart")
+
+    shipping_charge = Decimal("0.00")
+    total_amount = subtotal + shipping_charge
+
+    order = Order.objects.create(
+        customer_name=customer_name,
+        customer_email=customer_email,
+        customer_phone=customer_phone,
+        address=address,
+        city=city,
+        state=state,
+        pincode=pincode,
+        subtotal=subtotal,
+        shipping_charge=shipping_charge,
+        total_amount=total_amount,
+        payment_method="cod",
+        payment_status="pending",
+        status="pending",
+    )
+
+    for item in items:
+
+        product = item["product"]
+
+        OrderItem.objects.create(
+            order=order,
+            product=product,
+            product_name=product.name,
+            price=item["price"],
+            quantity=item["quantity"],
+            total=item["total"],
+        )
+
+        product.stock -= item["quantity"]
+
+        if product.stock == 0:
+            product.is_available = False
+
+        product.save(
+            update_fields=[
+                "stock",
+                "is_available",
+            ]
+        )
+
+    request.session["cart"] = {}
+    request.session.modified = True
+
+    return redirect(
+        "order_success",
+        order_number=order.order_number
+    )
+
+
+def order_success(request, order_number):
+
+    order = get_object_or_404(
+        Order,
+        order_number=order_number
+    )
+
+    return render(
+        request,
+        "store/order_success.html",
+        {"order": order}
+    )
