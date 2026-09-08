@@ -171,16 +171,16 @@ MAILERS = {
     "default": {
         "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
         "OPTIONS": {
-            "host": os.environ.get("EMAIL_HOST", "smtp.gmail.com"),
-            "port": int(os.environ.get("EMAIL_PORT", "587")),
-            "username": os.environ.get("EMAIL_HOST_USER"),
-            "password": os.environ.get("EMAIL_HOST_PASSWORD"),
-            "use_tls": os.environ.get("EMAIL_USE_TLS", "True").lower() == "true",
+            "host": "smtp.gmail.com",
+            "port": 587,
+            "username": os.environ.get("GMAIL_EMAIL"),
+            "password": os.environ.get("GMAIL_APP_PASSWORD"),
+            "use_tls": True,
         },
     },
 }
 
 DEFAULT_FROM_EMAIL = os.environ.get(
     "DEFAULT_FROM_EMAIL",
-    os.environ.get("EMAIL_HOST_USER")
+    os.environ.get("GMAIL_EMAIL", "")
 )

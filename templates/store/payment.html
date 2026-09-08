@@ -1,20 +1,67 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Payment - ShopEasy</title>
+    <title>Secure Payment - ShopEasy Garden</title>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .payment-box {
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            width: 380px;
+        }
+
+        button {
+            background: #111;
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+    </style>
 </head>
 
 <body>
 
-<h1>Complete Payment</h1>
+<div class="payment-box">
 
-<h2>Total: ₹{{ total }}</h2>
+    <h2>Complete Payment</h2>
 
-<button id="pay-button">
-    Pay ₹{{ total }}
-</button>
+    <p>
+        Order:
+        <strong>{{ order.order_number }}</strong>
+    </p>
 
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <h3>
+        ₹{{ total }}
+    </h3>
+
+    <button id="pay-button">
+        Pay ₹{{ total }}
+    </button>
+
+</div>
+
 
 <script>
 
@@ -26,9 +73,9 @@ const options = {
 
     currency: "INR",
 
-    name: "ShopEasy",
+    name: "ShopEasy Garden",
 
-    description: "Garden Order",
+    description: "Order {{ order.order_number }}",
 
     order_id: "{{ razorpay_order_id }}",
 
@@ -39,32 +86,24 @@ const options = {
         form.method = "POST";
         form.action = "{% url 'payment_success' %}";
 
-        const csrfToken = "{{ csrf_token }}";
+        const orderId = document.createElement("input");
+        orderId.type = "hidden";
+        orderId.name = "razorpay_order_id";
+        orderId.value = response.razorpay_order_id;
 
-        const fields = {
-            csrfmiddlewaretoken: csrfToken,
+        const paymentId = document.createElement("input");
+        paymentId.type = "hidden";
+        paymentId.name = "razorpay_payment_id";
+        paymentId.value = response.razorpay_payment_id;
 
-            razorpay_payment_id:
-                response.razorpay_payment_id,
+        const signature = document.createElement("input");
+        signature.type = "hidden";
+        signature.name = "razorpay_signature";
+        signature.value = response.razorpay_signature;
 
-            razorpay_order_id:
-                response.razorpay_order_id,
-
-            razorpay_signature:
-                response.razorpay_signature
-        };
-
-        for (const key in fields) {
-
-            const input =
-                document.createElement("input");
-
-            input.type = "hidden";
-            input.name = key;
-            input.value = fields[key];
-
-            form.appendChild(input);
-        }
+        form.appendChild(orderId);
+        form.appendChild(paymentId);
+        form.appendChild(signature);
 
         document.body.appendChild(form);
 
@@ -72,23 +111,30 @@ const options = {
     },
 
     theme: {
-        color: "#2f6b3f"
+        color: "#111111"
     }
 };
 
 
-const razorpay =
-    new Razorpay(options);
+const rzp = new Razorpay(options);
 
 
-document
-    .getElementById("pay-button")
-    .onclick = function(e) {
+rzp.on("payment.failed", function (response) {
 
-        razorpay.open();
+    window.location.href =
+        "{% url 'payment_failed' %}";
+
+});
+
+
+document.getElementById("pay-button")
+    .addEventListener("click", function (e) {
+
+        rzp.open();
 
         e.preventDefault();
-    };
+
+    });
 
 </script>
 

@@ -1,25 +1,44 @@
 from django.contrib import admin
-from .models import Category, Product, Order, OrderItem
 
+from .models import (
+    Category,
+    Product,
+    Order,
+    OrderItem,
+)
+
+
+# =========================================================
+# CATEGORY
+# =========================================================
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
 
     list_display = (
+        "id",
         "name",
         "slug",
     )
+
+    prepopulated_fields = {
+        "slug": ("name",)
+    }
 
     search_fields = (
         "name",
-        "slug",
     )
 
+
+# =========================================================
+# PRODUCT
+# =========================================================
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
 
     list_display = (
+        "id",
         "name",
         "category",
         "price",
@@ -31,6 +50,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = (
         "category",
         "is_available",
+        "created_at",
     )
 
     search_fields = (
@@ -42,6 +62,10 @@ class ProductAdmin(admin.ModelAdmin):
         "slug": ("name",)
     }
 
+
+# =========================================================
+# ORDER ITEM INLINE
+# =========================================================
 
 class OrderItemInline(admin.TabularInline):
 
@@ -57,10 +81,15 @@ class OrderItemInline(admin.TabularInline):
     )
 
 
+# =========================================================
+# ORDER
+# =========================================================
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
 
     list_display = (
+        "id",
         "order_number",
         "customer_name",
         "customer_email",
@@ -73,9 +102,9 @@ class OrderAdmin(admin.ModelAdmin):
     )
 
     list_filter = (
-        "status",
-        "payment_status",
         "payment_method",
+        "payment_status",
+        "status",
         "created_at",
     )
 
@@ -92,7 +121,6 @@ class OrderAdmin(admin.ModelAdmin):
         "order_number",
         "razorpay_order_id",
         "razorpay_payment_id",
-        "payment_id",
         "created_at",
         "updated_at",
     )
