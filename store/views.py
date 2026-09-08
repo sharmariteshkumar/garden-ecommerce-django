@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.core.mail import send_mail
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect
@@ -776,6 +777,23 @@ def payment_success(request):
                 order.status = "confirmed"
 
                 order.save()
+                
+            if order.email:
+                subject = f"Order Confirmation - #{order.id}"
+                message = (
+                    f"Hello {order.name},\n\n"
+                    f"Thank you for your order! Your order #{order.id} has been placed successfully.\n\n"
+                    f"Total Amount: ₹{order.total_price}\n\n"
+                    f"We will update you once it is dispatched."
+                )
+    
+                send_mail(
+                    subject=subject,
+                    message=message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[order.email],
+                    fail_silently=True,
+                )
 
             else:
 

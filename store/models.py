@@ -1,5 +1,9 @@
 from django.db import models
 import uuid
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 class Category(models.Model):
@@ -170,3 +174,30 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.product_name} x {self.quantity}"
+    
+@receiver(pre_save, sender=Order)
+def notify_delivery_status(sender, instance, **kwargs):
+    if not instance.pk:
+        return  # Direct naya order banne par email na jaye (wo views se jata hai)
+
+    try:
+        old_order = Order.objects.get(pk=instance.pk)
+        # Check karein ki Admin ne status badal kar 'Delivered' kiya hai ya nahi
+        if old_order.status != 'Delivered' and instance.status == 'Delivered':
+            if instance.email:
+                subject = f"Order Delivered - #{instance.id}"
+                message = (
+                    f"Hello {instance.name},\n\n"
+                    f"Great news! Your order #{instance.id} has been successfully delivered.\n\n"
+                    f"Thank you for shopping with us!"
+                )
+                
+                send_mail(
+                    subject=subject,
+                    message=message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[instance.email],
+                    fail_silently=True,
+                )
+    except Order.DoesNotExist:
+        pass
