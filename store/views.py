@@ -548,76 +548,61 @@ def checkout(request):
 # =========================================================
 
 def send_order_emails(order):
-
     from_email = (
         os.environ.get("DEFAULT_FROM_EMAIL")
         or os.environ.get("EMAIL_HOST_USER")
     )
-
-    admin_email = os.environ.get(
-        "ADMIN_EMAIL"
-    )
+    admin_email = os.environ.get("ADMIN_EMAIL")
 
     if not from_email:
-        print(
-            "EMAIL NOT SENT: DEFAULT_FROM_EMAIL missing."
-        )
+        print("EMAIL NOT SENT: DEFAULT_FROM_EMAIL is missing in environment variables.")
         return
 
-    items_text = []
+    items_text = "\n".join([f"- {item.product_name} x {item.quantity} = ₹{item.total}" for item in order.items.all()])
 
-    for item in order.items.all():
+    # Customer Email
+    customer_subject = f"ShopEasy Garden - Order {order.order_number} Confirmed"
+    customer_message = f"""Hello {order.customer_name},
 
-        items_text.append(
-            f"- {item.product_name} "
-            f"x {item.quantity} = "
-            f"₹{item.total}"
-        )
-
-    items_text = "\n".join(items_text)
-
-    customer_subject = (
-        f"ShopEasy Garden - Order "
-        f"{order.order_number} Confirmed"
-    )
-
-    customer_message = f"""
-Hello {order.customer_name},
-
-Thank you for your order from ShopEasy Garden.
-
-Your order has been successfully confirmed.
+Thank you for your order!
 
 Order Number: {order.order_number}
-Payment ID: {order.razorpay_payment_id}
+Payment Status: {order.payment_status.upper()}
 Total Amount: ₹{order.total_amount}
 
-Items:
+Items Ordered:
 {items_text}
 
-Shipping Address:
-{order.address}
-{order.city}, {order.state} - {order.pincode}
+Delivery Address:
+{order.address}, {order.city}, {order.state} - {order.pincode}
 
-Thank you for shopping with ShopEasy Garden.
+We will notify you once your order is delivered!
 """
 
     try:
-
         send_mail(
             customer_subject,
             customer_message,
             from_email,
             [order.customer_email],
-            fail_silently=True,
+            fail_silently=False,  # Isse exact error terminal/logs me dikhega agar send na ho
         )
-
+        print(f"CONFIRMATION EMAIL SENT TO: {order.customer_email}")
     except Exception as e:
+        print("CUSTOMER EMAIL FAILED:", repr(e))
 
-        print(
-            "CUSTOMER EMAIL ERROR:",
-            e
-        )
+    # Admin Email (Optional)
+    if admin_email:
+        try:
+            send_mail(
+                f"New Order #{order.order_number} Received",
+                f"New order placed by {order.customer_name} ({order.customer_email}) for amount ₹{order.total_amount}.",
+                from_email,
+                [admin_email],
+                fail_silently=True,
+            )
+        except Exception as e:
+            print("ADMIN EMAIL FAILED:", repr(e))
 
     # -------------------------
     # Admin email

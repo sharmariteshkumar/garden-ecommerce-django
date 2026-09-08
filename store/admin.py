@@ -101,6 +101,12 @@ class OrderAdmin(admin.ModelAdmin):
         "created_at",
     )
 
+    # Directly edit status & payment_status from admin list view
+    list_editable = (
+        "payment_status",
+        "status",
+    )
+
     list_filter = (
         "payment_method",
         "payment_status",
@@ -128,4 +134,3 @@ class OrderAdmin(admin.ModelAdmin):
     inlines = [
         OrderItemInline
     ]
-
