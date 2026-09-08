@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment - ShopEasy</title>
+</head>
+
+<body>
+
+<h1>Complete Payment</h1>
+
+<h2>Total: ₹{{ total }}</h2>
+
+<button id="pay-button">
+    Pay ₹{{ total }}
+</button>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+
+const options = {
+
+    key: "{{ razorpay_key_id }}",
+
+    amount: "{{ amount }}",
+
+    currency: "INR",
+
+    name: "ShopEasy",
+
+    description: "Garden Order",
+
+    order_id: "{{ razorpay_order_id }}",
+
+    handler: function (response) {
+
+        const form = document.createElement("form");
+
+        form.method = "POST";
+        form.action = "{% url 'payment_success' %}";
+
+        const csrfToken = "{{ csrf_token }}";
+
+        const fields = {
+            csrfmiddlewaretoken: csrfToken,
+
+            razorpay_payment_id:
+                response.razorpay_payment_id,
+
+            razorpay_order_id:
+                response.razorpay_order_id,
+
+            razorpay_signature:
+                response.razorpay_signature
+        };
+
+        for (const key in fields) {
+
+            const input =
+                document.createElement("input");
+
+            input.type = "hidden";
+            input.name = key;
+            input.value = fields[key];
+
+            form.appendChild(input);
+        }
+
+        document.body.appendChild(form);
+
+        form.submit();
+    },
+
+    theme: {
+        color: "#2f6b3f"
+    }
+};
+
+
+const razorpay =
+    new Razorpay(options);
+
+
+document
+    .getElementById("pay-button")
+    .onclick = function(e) {
+
+        razorpay.open();
+
+        e.preventDefault();
+    };
+
+</script>
+
+</body>
+</html>
