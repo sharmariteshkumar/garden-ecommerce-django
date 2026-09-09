@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.core.mail import send_mail
+from django.conf import settings
 
 from .models import (
     Category,
@@ -6,7 +8,6 @@ from .models import (
     Order,
     OrderItem,
 )
-
 
 # =========================================================
 # CATEGORY
@@ -134,3 +135,71 @@ class OrderAdmin(admin.ModelAdmin):
     inlines = [
         OrderItemInline
     ]
+
+    def save_model(self, request, obj, form, change):
+        old_status = None
+
+        if change:
+            try:
+                old_order = Order.objects.get(pk=obj.pk)
+                old_status = old_order.status
+            except Order.DoesNotExist:
+                pass
+
+        super().save_model(request, obj, form, change)
+
+        # Email only when STATUS is actually changed from admin panel
+        if (
+            change
+            and old_status
+            and old_status != obj.status
+            and obj.customer_email
+        ):
+            status_label = obj.get_status_display()
+
+            subject = (
+                f"ShopEasy Garden - Order "
+                f"{obj.order_number} Status Updated"
+            )
+
+            message = f"""Hello {obj.customer_name},
+
+Your order #{obj.order_number} status has been updated.
+
+Order Number: {obj.order_number}
+New Status: {status_label}
+Payment Status: {obj.get_payment_status_display()}
+Total Amount: ₹{obj.total_amount}
+
+Thank you for shopping with ShopEasy Garden.
+
+Regards,
+ShopEasy Garden
+"""
+
+            try:
+                send_mail(
+                    subject=subject,
+                    message=message,
+                    from_email=(
+                        settings.DEFAULT_FROM_EMAIL
+                        or settings.EMAIL_HOST_USER
+                    ),
+                    recipient_list=[obj.customer_email],
+                    fail_silently=False,
+                )
+
+                print(
+                    f"STATUS EMAIL SENT TO: "
+                    f"{obj.customer_email} | "
+                    f"{obj.order_number} | "
+                    f"{status_label}"
+                )
+
+            except Exception as e:
+                print(
+                    f"STATUS EMAIL FAILED: "
+                    f"{obj.customer_email} | "
+                    f"{obj.order_number} | "
+                    f"{repr(e)}"
+                )

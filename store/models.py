@@ -1,9 +1,5 @@
 from django.db import models
 import uuid
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
-from django.core.mail import send_mail
-from django.conf import settings
 
 
 class Category(models.Model):
@@ -174,31 +170,3 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.product_name} x {self.quantity}"
-    
-@receiver(pre_save, sender=Order)
-def notify_delivery_status(sender, instance, **kwargs):
-    if not instance.pk:
-        return
-
-    try:
-        old_order = Order.objects.get(pk=instance.pk)
-        # Old status delivered nahi tha par ab Admin ne Delivered set kiya hai
-        if old_order.status != 'delivered' and instance.status == 'delivered':
-            if instance.customer_email:
-                subject = f"Order Delivered - #{instance.order_number}"
-                message = (
-                    f"Hello {instance.customer_name},\n\n"
-                    f"Great news! Your order #{instance.order_number} has been successfully delivered.\n\n"
-                    f"Thank you for shopping with ShopEasy Garden!"
-                )
-                
-                send_mail(
-                    subject=subject,
-                    message=message,
-                    from_email=settings.DEFAULT_FROM_EMAIL or os.environ.get("EMAIL_HOST_USER"),
-                    recipient_list=[instance.customer_email],
-                    fail_silently=True,
-                )
-                print(f"DELIVERY EMAIL SENT TO: {instance.customer_email}")
-    except Order.DoesNotExist:
-        pass
