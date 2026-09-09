@@ -33,7 +33,9 @@
             line-height: 1.6;
         }
 
-        a { text-decoration: none; }
+        a {
+            text-decoration: none;
+        }
 
         /* NAVBAR (Exact from home.html) */
         .main-navbar {
@@ -85,7 +87,8 @@
             transition: all 0.25s ease;
         }
 
-        .nav-link:hover, .nav-link.active {
+        .nav-link:hover,
+        .nav-link.active {
             color: var(--green) !important;
             background: var(--light-green);
         }
@@ -251,7 +254,15 @@
                     </form>
                     {% endif %}
 
-                    <a href="#" class="nav-link d-none d-lg-block">Login</a>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'profile' %}" class="nav-link d-none d-lg-block">
+                        {{ user.first_name|default:user.username }}
+                    </a>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="nav-link d-none d-lg-block">
+                        Login
+                    </a>
+                    {% endif %}
 
                     <a href="{% url 'cart' %}" class="cart-btn" aria-label="Shopping cart">
                         <i class="bi bi-bag fs-5"></i>

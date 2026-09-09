@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="auth-container">
+
+    <div class="auth-card">
+
+        <h2>Create Account</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {{ form.non_field_errors }}
+
+            {% for field in form %}
+
+                <div class="form-group">
+
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <small>
+                            {{ field.help_text }}
+                        </small>
+                    {% endif %}
+
+                    {{ field.errors }}
+
+                </div>
+
+            {% endfor %}
+
+            <button type="submit">
+                Create Account
+            </button>
+
+        </form>
+
+        <div class="auth-links">
+
+            <span>Already have an account?</span>
+
+            <a href="{% url 'login' %}">
+                Login
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

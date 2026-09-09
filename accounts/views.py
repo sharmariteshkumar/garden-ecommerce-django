@@ -1,5 +1,103 @@
-from django.http import HttpResponse
+from django.contrib import messages
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.views import (
+    LoginView,
+    LogoutView,
+    PasswordResetView,
+    PasswordResetDoneView,
+    PasswordResetConfirmView,
+    PasswordResetCompleteView,
+)
+from django.urls import reverse_lazy
+from django.views.generic import CreateView
+from .forms import RegisterForm, LoginForm
 
 
-def home(request):
-    return HttpResponse("Welcome to my Django Project!")
+class UserLoginView(LoginView):
+    template_name = "accounts/login.html"
+    redirect_authenticated_user = True
+
+    def form_valid(self, form):
+        messages.success(
+            self.request,
+            "Welcome back!"
+        )
+        return super().form_valid(form)
+
+
+class UserLogoutView(LogoutView):
+    next_page = reverse_lazy("home")
+
+
+class RegisterView(CreateView):
+    form_class = UserCreationForm
+    template_name = "accounts/register.html"
+    success_url = reverse_lazy("home")
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+
+        login(
+            self.request,
+            self.object
+        )
+
+        messages.success(
+            self.request,
+            "Account created successfully."
+        )
+
+        return response
+
+
+class UserPasswordResetView(PasswordResetView):
+    template_name = "accounts/password_reset.html"
+    email_template_name = "accounts/password_reset_email.html"
+    subject_template_name = "accounts/password_reset_subject.txt"
+    success_url = reverse_lazy("password_reset_done")
+
+
+class UserPasswordResetDoneView(PasswordResetDoneView):
+    template_name = "accounts/password_reset_done.html"
+
+
+class UserPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = "accounts/password_reset_confirm.html"
+    success_url = reverse_lazy("password_reset_complete")
+
+
+class UserPasswordResetCompleteView(PasswordResetCompleteView):
+    template_name = "accounts/password_reset_complete.html"
+    
+class UserLoginView(LoginView):
+    template_name = "accounts/login.html"
+    authentication_form = LoginForm
+    redirect_authenticated_user = True
+
+    def form_valid(self, form):
+        messages.success(
+            self.request,
+            "Welcome back!"
+        )
+        return super().form_valid(form)
+
+class RegisterView(CreateView):
+    form_class = RegisterForm
+    template_name = "accounts/register.html"
+    success_url = reverse_lazy("home")
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+
+        login(
+            self.request,
+            self.object
+        )
+
+        messages.success(
+            self.request,
+            "Account created successfully."
+        )
+
+        return response

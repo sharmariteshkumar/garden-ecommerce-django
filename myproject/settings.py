@@ -162,3 +162,7 @@ BREVO_SENDER_NAME = os.environ.get(
     "BREVO_SENDER_NAME",
     "ShopEasy Garden"
 )
+
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
+
