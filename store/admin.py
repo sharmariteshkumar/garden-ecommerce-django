@@ -1,6 +1,5 @@
 from django.contrib import admin
-from django.core.mail import send_mail
-from django.conf import settings
+from .email_service import send_brevo_email
 
 from .models import (
     Category,
@@ -178,23 +177,79 @@ ShopEasy Garden
 """
 
             try:
-                send_mail(
+                html_message = f"""
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+                    <h2 style="color: #2e7d32;">
+                        ShopEasy Garden
+                    </h2>
+
+                    <p>Hello {obj.customer_name},</p>
+
+                    <p>
+                        Your order
+                        <strong>#{obj.order_number}</strong>
+                        status has been updated.
+                    </p>
+
+                    <div style="
+                        background: #f5f5f5;
+                        padding: 15px;
+                        border-radius: 8px;
+                        margin: 20px 0;
+                    ">
+                        <p>
+                            <strong>Order Number:</strong>
+                            {obj.order_number}
+                        </p>
+
+                        <p>
+                            <strong>New Status:</strong>
+                            {status_label}
+                        </p>
+
+                        <p>
+                            <strong>Payment Status:</strong>
+                            {obj.get_payment_status_display()}
+                        </p>
+
+                        <p>
+                            <strong>Total Amount:</strong>
+                            ₹{obj.total_amount}
+                        </p>
+                    </div>
+
+                    <p>
+                        Thank you for shopping with ShopEasy Garden.
+                    </p>
+
+                    <p>
+                        Regards,<br>
+                        <strong>ShopEasy Garden</strong>
+                    </p>
+                </div>
+                """
+
+                email_sent = send_brevo_email(
+                    to_email=obj.customer_email,
                     subject=subject,
-                    message=message,
-                    from_email=(
-                        settings.DEFAULT_FROM_EMAIL
-                        or settings.EMAIL_HOST_USER
-                    ),
-                    recipient_list=[obj.customer_email],
-                    fail_silently=False,
+                    html_content=html_message,
+                    to_name=obj.customer_name,
                 )
 
-                print(
-                    f"STATUS EMAIL SENT TO: "
-                    f"{obj.customer_email} | "
-                    f"{obj.order_number} | "
-                    f"{status_label}"
-                )
+                if email_sent:
+                    print(
+                        f"STATUS EMAIL SENT TO: "
+                        f"{obj.customer_email} | "
+                        f"{obj.order_number} | "
+                        f"{status_label}"
+                    )
+                else:
+                    print(
+                        f"STATUS EMAIL FAILED: "
+                        f"{obj.customer_email} | "
+                        f"{obj.order_number} | "
+                        f"{status_label}"
+                    )
 
             except Exception as e:
                 print(
