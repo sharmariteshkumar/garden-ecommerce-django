@@ -1,6 +1,5 @@
 from django.contrib import messages
 from django.contrib.auth import login
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import (
     LoginView,
     LogoutView,
@@ -15,7 +14,8 @@ from .forms import RegisterForm, LoginForm
 
 
 class UserLoginView(LoginView):
-    template_name = "accounts/login.html"
+    template_name = "store/login.html"
+    authentication_form = LoginForm
     redirect_authenticated_user = True
 
     def form_valid(self, form):
@@ -31,7 +31,7 @@ class UserLogoutView(LogoutView):
 
 
 class RegisterView(CreateView):
-    form_class = UserCreationForm
+    form_class = RegisterForm
     template_name = "accounts/register.html"
     success_url = reverse_lazy("home")
 
@@ -69,35 +69,3 @@ class UserPasswordResetConfirmView(PasswordResetConfirmView):
 
 class UserPasswordResetCompleteView(PasswordResetCompleteView):
     template_name = "accounts/password_reset_complete.html"
-    
-class UserLoginView(LoginView):
-    template_name = "accounts/login.html"
-    authentication_form = LoginForm
-    redirect_authenticated_user = True
-
-    def form_valid(self, form):
-        messages.success(
-            self.request,
-            "Welcome back!"
-        )
-        return super().form_valid(form)
-
-class RegisterView(CreateView):
-    form_class = RegisterForm
-    template_name = "accounts/register.html"
-    success_url = reverse_lazy("home")
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-
-        login(
-            self.request,
-            self.object
-        )
-
-        messages.success(
-            self.request,
-            "Account created successfully."
-        )
-
-        return response
