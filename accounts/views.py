@@ -32,7 +32,7 @@ class UserLogoutView(LogoutView):
 
 class RegisterView(CreateView):
     form_class = RegisterForm
-    template_name = "accounts/register.html"
+    template_name = "store/register.html"
     success_url = reverse_lazy("home")
 
     def form_valid(self, form):
@@ -52,20 +52,20 @@ class RegisterView(CreateView):
 
 
 class UserPasswordResetView(PasswordResetView):
-    template_name = "accounts/password_reset.html"
-    email_template_name = "accounts/password_reset_email.html"
-    subject_template_name = "accounts/password_reset_subject.txt"
+    template_name = "store/password_reset.html"
+    email_template_name = "store/password_reset_email.html"
+    subject_template_name = "store/password_reset_subject.txt"
     success_url = reverse_lazy("password_reset_done")
 
 
 class UserPasswordResetDoneView(PasswordResetDoneView):
-    template_name = "accounts/password_reset_done.html"
+    template_name = "store/password_reset_done.html"
 
 
 class UserPasswordResetConfirmView(PasswordResetConfirmView):
-    template_name = "accounts/password_reset_confirm.html"
+    template_name = "store/password_reset_confirm.html"
     success_url = reverse_lazy("password_reset_complete")
 
 
 class UserPasswordResetCompleteView(PasswordResetCompleteView):
-    template_name = "accounts/password_reset_complete.html"
+    template_name = "store/password_reset_complete.html"
