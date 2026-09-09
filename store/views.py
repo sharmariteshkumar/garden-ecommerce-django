@@ -585,16 +585,15 @@ Thank you for shopping with ShopEasy Garden.
 """
 
     try:
-
-        email_sent = send_customer_email(
+        sent = send_customer_email(
             to_email=order.customer_email,
             subject=customer_subject,
             message=customer_message,
         )
 
-        if email_sent:
+        if sent:
             print(
-                f"CONFIRMATION EMAIL SENT TO: "
+                f"CONFIRMATION EMAIL SENT: "
                 f"{order.customer_email}"
             )
         else:
@@ -604,9 +603,8 @@ Thank you for shopping with ShopEasy Garden.
             )
 
     except Exception as e:
-
         print(
-            "CUSTOMER EMAIL FAILED:",
+            "CUSTOMER EMAIL ERROR:",
             repr(e)
         )
 
@@ -650,16 +648,15 @@ Address:
 """
 
         try:
-
-            admin_sent = send_customer_email(
+            sent = send_customer_email(
                 to_email=admin_email,
                 subject=admin_subject,
                 message=admin_message,
             )
 
-            if admin_sent:
+            if sent:
                 print(
-                    f"ADMIN EMAIL SENT TO: "
+                    f"ADMIN EMAIL SENT: "
                     f"{admin_email}"
                 )
             else:
@@ -669,9 +666,8 @@ Address:
                 )
 
         except Exception as e:
-
             print(
-                "ADMIN EMAIL FAILED:",
+                "ADMIN EMAIL ERROR:",
                 repr(e)
             )
             
