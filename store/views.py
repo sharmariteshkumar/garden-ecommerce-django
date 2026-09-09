@@ -6,8 +6,7 @@ import razorpay
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from django.core.mail import send_mail
-from django.conf import settings
+from .email_service import send_customer_email
 from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect
@@ -548,20 +547,24 @@ def checkout(request):
 # =========================================================
 
 def send_order_emails(order):
-    from_email = (
-        os.environ.get("DEFAULT_FROM_EMAIL")
-        or os.environ.get("EMAIL_HOST_USER")
-    )
+
     admin_email = os.environ.get("ADMIN_EMAIL")
 
-    if not from_email:
-        print("EMAIL NOT SENT: DEFAULT_FROM_EMAIL is missing in environment variables.")
-        return
+    items_text = "\n".join(
+        [
+            f"- {item.product_name} x {item.quantity} = ₹{item.total}"
+            for item in order.items.all()
+        ]
+    )
 
-    items_text = "\n".join([f"- {item.product_name} x {item.quantity} = ₹{item.total}" for item in order.items.all()])
+    # =====================================================
+    # CUSTOMER EMAIL
+    # =====================================================
 
-    # Customer Email
-    customer_subject = f"ShopEasy Garden - Order {order.order_number} Confirmed"
+    customer_subject = (
+        f"ShopEasy Garden - Order {order.order_number} Confirmed"
+    )
+
     customer_message = f"""Hello {order.customer_name},
 
 Thank you for your order!
@@ -577,36 +580,39 @@ Delivery Address:
 {order.address}, {order.city}, {order.state} - {order.pincode}
 
 We will notify you once your order is delivered!
+
+Thank you for shopping with ShopEasy Garden.
 """
 
     try:
-        send_mail(
-            customer_subject,
-            customer_message,
-            from_email,
-            [order.customer_email],
-            fail_silently=False,  # Isse exact error terminal/logs me dikhega agar send na ho
+
+        email_sent = send_customer_email(
+            to_email=order.customer_email,
+            subject=customer_subject,
+            message=customer_message,
         )
-        print(f"CONFIRMATION EMAIL SENT TO: {order.customer_email}")
-    except Exception as e:
-        print("CUSTOMER EMAIL FAILED:", repr(e))
 
-    # Admin Email (Optional)
-    if admin_email:
-        try:
-            send_mail(
-                f"New Order #{order.order_number} Received",
-                f"New order placed by {order.customer_name} ({order.customer_email}) for amount ₹{order.total_amount}.",
-                from_email,
-                [admin_email],
-                fail_silently=True,
+        if email_sent:
+            print(
+                f"CONFIRMATION EMAIL SENT TO: "
+                f"{order.customer_email}"
             )
-        except Exception as e:
-            print("ADMIN EMAIL FAILED:", repr(e))
+        else:
+            print(
+                f"CONFIRMATION EMAIL FAILED: "
+                f"{order.customer_email}"
+            )
 
-    # -------------------------
-    # Admin email
-    # -------------------------
+    except Exception as e:
+
+        print(
+            "CUSTOMER EMAIL FAILED:",
+            repr(e)
+        )
+
+    # =====================================================
+    # ADMIN EMAIL
+    # =====================================================
 
     if admin_email:
 
@@ -615,10 +621,10 @@ We will notify you once your order is delivered!
             f"{order.order_number}"
         )
 
-        admin_message = f"""
-New order received.
+        admin_message = f"""New order received.
 
-Order Number: {order.order_number}
+Order Number:
+{order.order_number}
 
 Customer:
 {order.customer_name}
@@ -645,22 +651,31 @@ Address:
 
         try:
 
-            send_mail(
-                admin_subject,
-                admin_message,
-                from_email,
-                [admin_email],
-                fail_silently=True,
+            admin_sent = send_customer_email(
+                to_email=admin_email,
+                subject=admin_subject,
+                message=admin_message,
             )
+
+            if admin_sent:
+                print(
+                    f"ADMIN EMAIL SENT TO: "
+                    f"{admin_email}"
+                )
+            else:
+                print(
+                    f"ADMIN EMAIL FAILED: "
+                    f"{admin_email}"
+                )
 
         except Exception as e:
 
             print(
-                "ADMIN EMAIL ERROR:",
-                e
+                "ADMIN EMAIL FAILED:",
+                repr(e)
             )
-
-
+            
+            
 # =========================================================
 # PAYMENT SUCCESS
 # =========================================================
