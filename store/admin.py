@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .email_service import send_brevo_email
+from .email_service import send_customer_email
 
 from .models import (
     Category,
@@ -136,6 +136,7 @@ class OrderAdmin(admin.ModelAdmin):
     ]
 
     def save_model(self, request, obj, form, change):
+
         old_status = None
 
         if change:
@@ -145,15 +146,20 @@ class OrderAdmin(admin.ModelAdmin):
             except Order.DoesNotExist:
                 pass
 
+        # Save order first
         super().save_model(request, obj, form, change)
 
-        # Email only when STATUS is actually changed from admin panel
+        # =====================================================
+        # SEND EMAIL ONLY WHEN ORDER STATUS CHANGES
+        # =====================================================
+
         if (
             change
             and old_status
             and old_status != obj.status
             and obj.customer_email
         ):
+
             status_label = obj.get_status_display()
 
             subject = (
@@ -177,73 +183,24 @@ ShopEasy Garden
 """
 
             try:
-                html_message = f"""
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
-                    <h2 style="color: #2e7d32;">
-                        ShopEasy Garden
-                    </h2>
 
-                    <p>Hello {obj.customer_name},</p>
-
-                    <p>
-                        Your order
-                        <strong>#{obj.order_number}</strong>
-                        status has been updated.
-                    </p>
-
-                    <div style="
-                        background: #f5f5f5;
-                        padding: 15px;
-                        border-radius: 8px;
-                        margin: 20px 0;
-                    ">
-                        <p>
-                            <strong>Order Number:</strong>
-                            {obj.order_number}
-                        </p>
-
-                        <p>
-                            <strong>New Status:</strong>
-                            {status_label}
-                        </p>
-
-                        <p>
-                            <strong>Payment Status:</strong>
-                            {obj.get_payment_status_display()}
-                        </p>
-
-                        <p>
-                            <strong>Total Amount:</strong>
-                            ₹{obj.total_amount}
-                        </p>
-                    </div>
-
-                    <p>
-                        Thank you for shopping with ShopEasy Garden.
-                    </p>
-
-                    <p>
-                        Regards,<br>
-                        <strong>ShopEasy Garden</strong>
-                    </p>
-                </div>
-                """
-
-                email_sent = send_brevo_email(
+                email_sent = send_customer_email(
                     to_email=obj.customer_email,
                     subject=subject,
-                    html_content=html_message,
-                    to_name=obj.customer_name,
+                    message=message,
                 )
 
                 if email_sent:
+
                     print(
                         f"STATUS EMAIL SENT TO: "
                         f"{obj.customer_email} | "
                         f"{obj.order_number} | "
                         f"{status_label}"
                     )
+
                 else:
+
                     print(
                         f"STATUS EMAIL FAILED: "
                         f"{obj.customer_email} | "
@@ -252,6 +209,7 @@ ShopEasy Garden
                     )
 
             except Exception as e:
+
                 print(
                     f"STATUS EMAIL FAILED: "
                     f"{obj.customer_email} | "

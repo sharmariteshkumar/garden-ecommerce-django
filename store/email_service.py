@@ -1,26 +1,32 @@
-import json
 import os
-import urllib.request
-import urllib.error
+import requests
 
 
 BREVO_API_URL = "https://api.brevo.com/v3/smtp/email"
 
 
-def send_brevo_email(to_email, subject, html_content, to_name="Customer"):
+def send_customer_email(
+    to_email,
+    subject,
+    message,
+):
     api_key = os.environ.get("BREVO_API_KEY")
     sender_email = os.environ.get("BREVO_SENDER_EMAIL")
     sender_name = os.environ.get(
         "BREVO_SENDER_NAME",
-        "ShopEasy Garden"
+        "ShopEasy Garden",
     )
 
     if not api_key:
-        print("BREVO EMAIL ERROR: BREVO_API_KEY is missing")
+        print("BREVO EMAIL FAILED: BREVO_API_KEY is missing")
         return False
 
     if not sender_email:
-        print("BREVO EMAIL ERROR: BREVO_SENDER_EMAIL is missing")
+        print("BREVO EMAIL FAILED: BREVO_SENDER_EMAIL is missing")
+        return False
+
+    if not to_email:
+        print("BREVO EMAIL FAILED: customer email is missing")
         return False
 
     payload = {
@@ -31,56 +37,44 @@ def send_brevo_email(to_email, subject, html_content, to_name="Customer"):
         "to": [
             {
                 "email": to_email,
-                "name": to_name or "Customer",
             }
         ],
         "subject": subject,
-        "htmlContent": html_content,
+        "textContent": message,
     }
 
-    data = json.dumps(payload).encode("utf-8")
-
-    request = urllib.request.Request(
-        BREVO_API_URL,
-        data=data,
-        headers={
-            "accept": "application/json",
-            "api-key": api_key,
-            "content-type": "application/json",
-        },
-        method="POST",
-    )
+    headers = {
+        "accept": "application/json",
+        "api-key": api_key,
+        "content-type": "application/json",
+    }
 
     try:
-        with urllib.request.urlopen(request, timeout=20) as response:
-            response_data = json.loads(
-                response.read().decode("utf-8")
-            )
+        response = requests.post(
+            BREVO_API_URL,
+            json=payload,
+            headers=headers,
+            timeout=15,
+        )
 
+        if 200 <= response.status_code < 300:
             print(
-                f"BREVO EMAIL SENT: {to_email} | "
-                f"{response_data.get('messageId', 'OK')}"
+                f"BREVO EMAIL SENT: "
+                f"{to_email} | {subject}"
             )
-
             return True
 
-    except urllib.error.HTTPError as exc:
-        error_body = exc.read().decode(
-            "utf-8",
-            errors="replace"
-        )
-
         print(
-            f"BREVO EMAIL FAILED: {to_email} | "
-            f"HTTP {exc.code} | {error_body}"
+            f"BREVO EMAIL FAILED: "
+            f"{to_email} | "
+            f"HTTP {response.status_code} | "
+            f"{response.text}"
         )
-
         return False
 
-    except Exception as exc:
+    except Exception as e:
         print(
-            f"BREVO EMAIL ERROR: {to_email} | "
-            f"{repr(exc)}"
+            f"BREVO EMAIL FAILED: "
+            f"{to_email} | {repr(e)}"
         )
-
         return False
