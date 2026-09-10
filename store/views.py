@@ -1140,3 +1140,43 @@ def my_orders(request):
 @login_required
 def profile(request):
     return render(request, "store/profile.html")
+
+@login_required
+@require_POST
+def cancel_order(request, order_id):
+
+    order = get_object_or_404(
+        Order,
+        id=order_id,
+        customer_email__iexact=request.user.email
+    )
+
+    # Shipping ke baad cancellation allowed nahi hai
+    if order.status in ["shipped", "delivered", "cancelled"]:
+        messages.error(
+            request,
+            "This order can no longer be cancelled."
+        )
+        return redirect("my_orders")
+
+    # Already cancelled
+    if order.status == "cancelled":
+        messages.info(
+            request,
+            "This order is already cancelled."
+        )
+        return redirect("my_orders")
+
+    # Cancel order
+    order.status = "cancelled"
+
+    order.save(
+        update_fields=["status"]
+    )
+
+    messages.success(
+        request,
+        f"Order {order.order_number} has been cancelled successfully."
+    )
+
+    return redirect("my_orders")

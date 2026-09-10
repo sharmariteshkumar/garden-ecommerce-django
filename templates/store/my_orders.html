@@ -15,31 +15,31 @@
 
     {% if orders %}
 
-        {% for order in orders %}
+    {% for order in orders %}
 
-        <div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
 
-            <div class="card-body p-4">
+        <div class="card-body p-4">
 
-                <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
 
-                    <div>
-                        <h5 class="fw-bold mb-1">
-                            Order #{{ order.order_number }}
-                        </h5>
+                <div>
+                    <h5 class="fw-bold mb-1">
+                        Order #{{ order.order_number }}
+                    </h5>
 
-                        <small class="text-muted">
-                            {{ order.created_at|date:"d M Y, h:i A" }}
-                        </small>
+                    <small class="text-muted">
+                        {{ order.created_at|date:"d M Y, h:i A" }}
+                    </small>
+                </div>
+
+                <div class="text-end">
+
+                    <div class="fw-bold">
+                        ₹{{ order.total_amount }}
                     </div>
 
-                    <div class="text-end">
-
-                        <div class="fw-bold">
-                            ₹{{ order.total_amount }}
-                        </div>
-
-                        <span class="badge
+                    <span class="badge
                             {% if order.status == 'pending' %}
                                 text-bg-warning
                             {% elif order.status == 'confirmed' %}
@@ -54,93 +54,110 @@
                                 text-bg-secondary
                             {% endif %}
                         ">
-                            {{ order.get_status_display }}
-                        </span>
-
-                    </div>
-
-                </div>
-
-                <hr>
-
-                <h6 class="fw-bold mb-3">Items</h6>
-
-                {% for item in order.items.all %}
-
-                <div class="d-flex justify-content-between mb-2">
-
-                    <div>
-                        {{ item.product_name }}
-                        <span class="text-muted">
-                            × {{ item.quantity }}
-                        </span>
-                    </div>
-
-                    <div class="fw-semibold">
-                        ₹{{ item.total }}
-                    </div>
-
-                </div>
-
-                {% endfor %}
-
-                <hr>
-
-                <div class="row">
-
-                    <div class="col-md-6">
-                        <small class="text-muted">
-                            Payment
-                        </small>
-
-                        <div class="fw-semibold">
-                            {{ order.get_payment_status_display }}
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <small class="text-muted">
-                            Delivery Address
-                        </small>
-
-                        <div>
-                            {{ order.address }},
-                            {{ order.city }},
-                            {{ order.state }}
-                            - {{ order.pincode }}
-                        </div>
-                    </div>
+                        {{ order.get_status_display }}
+                    </span>
 
                 </div>
 
             </div>
 
+            <hr>
+
+            <h6 class="fw-bold mb-3">Items</h6>
+
+            {% for item in order.items.all %}
+
+            <div class="d-flex justify-content-between mb-2">
+
+                <div>
+                    {{ item.product_name }}
+                    <span class="text-muted">
+                        × {{ item.quantity }}
+                    </span>
+                </div>
+
+                <div class="fw-semibold">
+                    ₹{{ item.total }}
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+            <hr>
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <small class="text-muted">
+                        Payment
+                    </small>
+
+                    <div class="fw-semibold">
+                        {{ order.get_payment_status_display }}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <small class="text-muted">
+                        Delivery Address
+                    </small>
+
+                    <div>
+                        {{ order.address }},
+                        {{ order.city }},
+                        {{ order.state }}
+                        - {{ order.pincode }}
+                    </div>
+                </div>
+
+            </div>
+            <!-- CANCEL ORDER -->
+            {% if order.status != "shipped" and order.status != "delivered" and order.status != "cancelled" %}
+
+            <div class="mt-4 pt-3 border-top">
+
+                <form method="POST" action="{% url 'cancel_order' order.id %}"
+                    onsubmit="return confirm('Are you sure you want to cancel this order?');">
+
+                    {% csrf_token %}
+
+                    <button type="submit" class="btn btn-outline-danger rounded-pill px-4">
+                        Cancel Order
+                    </button>
+
+                </form>
+
+            </div>
+
+            {% endif %}
         </div>
 
-        {% endfor %}
+    </div>
+
+    {% endfor %}
 
     {% else %}
 
-        <div class="text-center py-5">
+    <div class="text-center py-5">
 
-            <div style="font-size: 60px;">
-                📦
-            </div>
-
-            <h4 class="fw-bold mt-3">
-                No orders yet
-            </h4>
-
-            <p class="text-muted">
-                Your placed orders will appear here.
-            </p>
-
-            <a href="{% url 'all_products' %}"
-               class="btn btn-success rounded-pill px-4">
-                Start Shopping
-            </a>
-
+        <div style="font-size: 60px;">
+            📦
         </div>
+
+        <h4 class="fw-bold mt-3">
+            No orders yet
+        </h4>
+
+        <p class="text-muted">
+            Your placed orders will appear here.
+        </p>
+
+        <a href="{% url 'all_products' %}" class="btn btn-success rounded-pill px-4">
+            Start Shopping
+        </a>
+
+    </div>
 
     {% endif %}
 

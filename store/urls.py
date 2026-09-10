@@ -22,4 +22,5 @@ urlpatterns = [
     path("payment-failed/",views.payment_failed,name="payment_failed"),
     path("my-orders/", views.my_orders, name="my_orders"),
     path("profile/", views.profile, name="profile"),
+    path("orders/<int:order_id>/cancel/",views.cancel_order,name="cancel_order"),
 ]
