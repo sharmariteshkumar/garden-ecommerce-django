@@ -314,6 +314,33 @@
             color: white;
         }
 
+        .btn-spinner {
+            display: none;
+            width: 17px;
+            height: 17px;
+            margin-left: 8px;
+            vertical-align: middle;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: buttonSpin 0.7s linear infinite;
+        }
+
+        .processing .btn-spinner {
+            display: inline-block;
+        }
+
+        .processing {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        @keyframes buttonSpin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         @media (max-width: 767px) {
             .page-header {
                 padding-top: 35px;
@@ -532,11 +559,10 @@
                     </div>
 
                     <!-- Checkout will be connected in next step -->
-                    <a href="{% url 'checkout' %}" class="checkout-btn d-block text-center text-decoration-none">
-                        <i class="bi bi-lock-fill me-2"></i>
-                        Proceed to Checkout
+                    <a href="{% url 'checkout' %}" class="btn btn-success" id="proceedCheckoutBtn">
+                        <span class="btn-text">Proceed to Checkout</span>
+                        <span class="btn-spinner" aria-hidden="true"></span>
                     </a>
-
                     <div class="secure-text">
                         <i class="bi bi-shield-check me-1"></i>
                         Secure checkout
@@ -696,6 +722,24 @@
             updatePrices();
 
         });
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const button = document.getElementById("proceedCheckoutBtn");
+
+            if (!button) return;
+
+            button.addEventListener("click", function () {
+
+                button.classList.add("processing");
+
+                button.querySelector(".btn-text").textContent =
+                    "Loading...";
+
+            });
+
+        });
+
     </script>
 
 </body>

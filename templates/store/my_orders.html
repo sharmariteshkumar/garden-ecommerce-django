@@ -63,11 +63,7 @@
                         onsubmit="return confirm('Are you sure you want to cancel this order?');">
 
                         {% csrf_token %}
-
-                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
-                            Cancel Order
-                        </button>
-
+                        
                     </form>
 
                     {% endif %}
@@ -136,6 +132,10 @@
                     onsubmit="return confirm('Are you sure you want to cancel this order?');">
 
                     {% csrf_token %}
+
+                    <button type="submit" class="btn btn-outline-danger rounded-pill px-4">
+                        Cancel Order
+                    </button>
 
                 </form>
 
