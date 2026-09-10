@@ -34,10 +34,11 @@ class CategoryAdmin(admin.ModelAdmin):
 class StockRestoreForm(ActionForm):
 
     restore_quantity = forms.IntegerField(
-        min_value=1,
-        label="Quantity to restore",
-        help_text="This quantity will be added to the current stock."
-    )
+    min_value=1,
+    required=False,
+    label="Quantity to restore",
+    help_text="This quantity will be added to the current stock."
+)
     
 # =========================================================
 # PRODUCT
