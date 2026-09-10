@@ -1,36 +1,298 @@
+```html
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Order Successful</title>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Order Successful | ShopEasy Garden</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f8f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+            color: #26332a;
+        }
+
+        .success-wrapper {
+            width: 100%;
+            max-width: 650px;
+        }
+
+        .success-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 45px 35px;
+            text-align: center;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.08);
+        }
+
+        .success-icon {
+            width: 85px;
+            height: 85px;
+            margin: 0 auto 22px;
+            border-radius: 50%;
+            background: #e8f7ed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 45px;
+        }
+
+        .success-title {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 700;
+            color: #198754;
+        }
+
+        .success-subtitle {
+            margin: 12px 0 28px;
+            color: #6c757d;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .order-box {
+            background: #f8faf9;
+            border: 1px solid #e5ebe7;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .order-label {
+            display: block;
+            color: #6c757d;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .order-number {
+            font-size: 22px;
+            font-weight: 700;
+            color: #212529;
+        }
+
+        .details {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 18px 0;
+            border-bottom: 1px solid #eeeeee;
+            text-align: left;
+        }
+
+        .details:last-child {
+            border-bottom: none;
+        }
+
+        .details-label {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .details-value {
+            font-weight: 600;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        .amount {
+            color: #198754;
+            font-size: 19px;
+        }
+
+        .email-box {
+            margin: 25px 0;
+            padding: 16px;
+            border-radius: 12px;
+            background: #eef8f1;
+            color: #356044;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 28px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 13px 24px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #198754;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: #157347;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #ffffff;
+            color: #198754;
+            border: 1px solid #198754;
+        }
+
+        .btn-secondary:hover {
+            background: #eaf7ef;
+        }
+
+        .footer-text {
+            margin-top: 28px;
+            color: #8a938d;
+            font-size: 13px;
+        }
+
+        @media (max-width: 576px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .success-card {
+                padding: 35px 20px;
+                border-radius: 20px;
+            }
+
+            .success-title {
+                font-size: 26px;
+            }
+
+            .success-icon {
+                width: 75px;
+                height: 75px;
+                font-size: 38px;
+            }
+
+            .details {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .details-value {
+                text-align: left;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
 </head>
 
 <body>
 
-<div style="text-align:center; margin-top:100px;">
+    <div class="success-wrapper">
 
-    <h1>🎉 Order Placed Successfully!</h1>
+        <div class="success-card">
 
-    <h2>Order #{{ order.order_number }}</h2>
+            <div class="success-icon">
+                ✓
+            </div>
 
-    <p>
-        Thank you, {{ order.customer_name }}.
-    </p>
+            <h1 class="success-title">
+                Order Placed Successfully!
+            </h1>
 
-    <p>
-        Amount Paid:
-        ₹{{ order.total_amount }}
-    </p>
+            <p class="success-subtitle">
+                Thank you for your order, {{ order.customer_name }}.
+                Your order has been received and is now being processed.
+            </p>
 
-    <p>
-        Confirmation email has been sent to
-        <strong>{{ order.customer_email }}</strong>.
-    </p>
+            <div class="order-box">
 
-    <a href="{% url 'store_home' %}">
-        Continue Shopping
-    </a>
+                <span class="order-label">
+                    ORDER NUMBER
+                </span>
 
-</div>
+                <div class="order-number">
+                    #{{ order.order_number }}
+                </div>
+
+            </div>
+
+            <div class="details">
+
+                <div class="details-label">
+                    Amount Paid
+                </div>
+
+                <div class="details-value amount">
+                    ₹{{ order.total_amount }}
+                </div>
+
+            </div>
+
+            <div class="details">
+
+                <div class="details-label">
+                    Customer
+                </div>
+
+                <div class="details-value">
+                    {{ order.customer_name }}
+                </div>
+
+            </div>
+
+            <div class="email-box">
+
+                📧 Confirmation email has been sent to
+                <strong>{{ order.customer_email }}</strong>.
+
+            </div>
+
+            <div class="buttons">
+
+                <a href="{% url 'store_home' %}" class="btn btn-primary">
+                    Continue Shopping
+                </a>
+
+                <a href="{% url 'my_orders' %}" class="btn btn-secondary">
+                    View My Orders
+                </a>
+
+            </div>
+
+            <div class="footer-text">
+                Thank you for shopping with ShopEasy Garden 🌿
+            </div>
+
+        </div>
+
+    </div>
 
 </body>
+
 </html>
+```
