@@ -365,15 +365,17 @@
 
                     {% if user.is_authenticated %}
 
-                    <a href="{% url 'my_orders' %}" class="nav-link d-none d-lg-block">
-                        My Orders
-                    </a>
-
-                    <a href="{% url 'logout' %}" class="nav-link d-none d-lg-block">
-                        Logout
+                    <a href="{% url 'profile' %}" class="nav-link d-none d-lg-block">
+                        {{ user.first_name|default:user.username }}
                     </a>
 
                     {% else %}
+
+                    <a href="{% url 'login' %}" class="nav-link d-none d-lg-block">
+                        Login
+                    </a>
+
+                    {% endif %}
 
                     <a href="{% url 'login' %}" class="nav-link d-none d-lg-block">
                         Login
