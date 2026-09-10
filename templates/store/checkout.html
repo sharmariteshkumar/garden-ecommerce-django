@@ -384,6 +384,8 @@
                             <select id="city" name="city" required disabled>
                                 <option value="">First select state</option>
                             </select>
+                            <small id="cityValidation" style="display:block; margin-top:6px; font-size:13px;">
+                            </small>
                         </div>
 
                     </div>
@@ -467,342 +469,309 @@
         const cityInput = document.getElementById("city");
         const cityValidation = document.getElementById("cityValidation");
 
-        /*
-         * State -> Valid Cities
-         */
         const stateCities = {
 
             "Andhra Pradesh": [
-                "Visakhapatnam",
-                "Vijayawada",
-                "Guntur",
-                "Nellore",
-                "Tirupati",
-                "Kurnool"
+                "Visakhapatnam", "Vijayawada", "Guntur", "Nellore",
+                "Tirupati", "Kurnool", "Rajahmundry", "Kakinada"
             ],
 
             "Arunachal Pradesh": [
-                "Itanagar",
-                "Naharlagun",
-                "Pasighat",
-                "Tawang"
+                "Itanagar", "Naharlagun", "Pasighat", "Tawang"
             ],
 
             "Assam": [
-                "Guwahati",
-                "Dibrugarh",
-                "Jorhat",
-                "Silchar",
-                "Tezpur"
+                "Guwahati", "Dibrugarh", "Silchar", "Jorhat", "Tezpur"
             ],
 
             "Bihar": [
-                "Patna",
-                "Gaya",
-                "Muzaffarpur",
-                "Bhagalpur",
-                "Darbhanga"
+                "Patna", "Gaya", "Bhagalpur", "Muzaffarpur", "Darbhanga"
             ],
 
             "Chhattisgarh": [
-                "Raipur",
-                "Bhilai",
-                "Bilaspur",
-                "Korba",
-                "Durg"
+                "Raipur", "Bhilai", "Bilaspur", "Korba", "Durg"
             ],
 
             "Goa": [
-                "Panaji",
-                "Margao",
-                "Vasco da Gama",
-                "Mapusa"
+                "Panaji", "Margao", "Vasco da Gama", "Mapusa"
             ],
 
             "Gujarat": [
-                "Ahmedabad",
-                "Surat",
-                "Vadodara",
-                "Rajkot",
-                "Bhavnagar",
-                "Jamnagar"
+                "Ahmedabad", "Surat", "Vadodara", "Rajkot",
+                "Bhavnagar", "Jamnagar", "Gandhinagar", "Junagadh"
             ],
 
             "Haryana": [
-                "Gurugram",
-                "Faridabad",
-                "Panipat",
-                "Ambala",
-                "Hisar",
-                "Karnal"
+                "Gurugram", "Faridabad", "Panipat", "Ambala",
+                "Hisar", "Rohtak", "Karnal"
             ],
 
             "Himachal Pradesh": [
-                "Shimla",
-                "Manali",
-                "Dharamshala",
-                "Solan",
-                "Mandi"
+                "Shimla", "Dharamshala", "Mandi", "Solan", "Kullu"
             ],
 
             "Jharkhand": [
-                "Ranchi",
-                "Jamshedpur",
-                "Dhanbad",
-                "Bokaro",
-                "Deoghar"
+                "Ranchi", "Jamshedpur", "Dhanbad", "Bokaro", "Deoghar"
             ],
 
             "Karnataka": [
-                "Bengaluru",
-                "Mysuru",
-                "Mangaluru",
-                "Hubballi",
-                "Belagavi",
-                "Dharwad"
+                "Bengaluru", "Mysuru", "Mangaluru", "Hubballi",
+                "Belagavi", "Davanagere", "Ballari", "Shivamogga"
             ],
 
             "Kerala": [
-                "Thiruvananthapuram",
-                "Kochi",
-                "Kozhikode",
-                "Thrissur",
-                "Kollam",
-                "Kannur"
+                "Thiruvananthapuram", "Kochi", "Kozhikode", "Thrissur",
+                "Kollam", "Kannur", "Alappuzha"
             ],
 
             "Madhya Pradesh": [
-                "Bhopal",
-                "Indore",
-                "Gwalior",
-                "Jabalpur",
-                "Ujjain",
-                "Sagar"
+                "Bhopal", "Indore", "Jabalpur", "Gwalior",
+                "Ujjain", "Sagar", "Rewa"
             ],
 
             "Maharashtra": [
-                "Mumbai",
-                "Pune",
-                "Nagpur",
-                "Nashik",
-                "Thane",
-                "Aurangabad",
-                "Kolhapur"
+                "Mumbai", "Pune", "Nagpur", "Nashik", "Thane",
+                "Aurangabad", "Navi Mumbai", "Kolhapur", "Solapur",
+                "Amravati", "Satara", "Sangli", "Jalgaon", "Akola"
             ],
 
             "Manipur": [
-                "Imphal",
-                "Thoubal",
-                "Bishnupur"
+                "Imphal", "Thoubal", "Bishnupur"
             ],
 
             "Meghalaya": [
-                "Shillong",
-                "Tura",
-                "Jowai"
+                "Shillong", "Tura", "Jowai"
             ],
 
             "Mizoram": [
-                "Aizawl",
-                "Lunglei",
-                "Champhai"
+                "Aizawl", "Lunglei", "Champhai"
             ],
 
             "Nagaland": [
-                "Kohima",
-                "Dimapur",
-                "Mokokchung"
+                "Kohima", "Dimapur", "Mokokchung"
             ],
 
             "Odisha": [
-                "Bhubaneswar",
-                "Cuttack",
-                "Rourkela",
-                "Puri",
-                "Berhampur",
-                "Sambalpur"
+                "Bhubaneswar", "Cuttack", "Rourkela", "Puri",
+                "Berhampur", "Sambalpur"
             ],
 
             "Punjab": [
-                "Amritsar",
-                "Ludhiana",
-                "Jalandhar",
-                "Patiala",
-                "Bathinda"
+                "Ludhiana", "Amritsar", "Jalandhar", "Patiala",
+                "Bathinda", "Mohali", "Pathankot"
             ],
 
             "Rajasthan": [
-                "Jaipur",
-                "Jodhpur",
-                "Udaipur",
-                "Kota",
-                "Ajmer",
-                "Bikaner"
+                "Jaipur", "Jodhpur", "Udaipur", "Kota",
+                "Ajmer", "Bikaner", "Alwar", "Bharatpur"
             ],
 
             "Sikkim": [
-                "Gangtok",
-                "Namchi",
-                "Gyalshing"
+                "Gangtok", "Namchi", "Gyalshing"
             ],
 
             "Tamil Nadu": [
-                "Chennai",
-                "Coimbatore",
-                "Madurai",
-                "Salem",
-                "Tiruchirappalli",
-                "Tirunelveli",
-                "Vellore"
+                "Chennai", "Coimbatore", "Madurai", "Tiruchirappalli",
+                "Salem", "Tirunelveli", "Vellore", "Erode", "Thoothukudi"
             ],
 
             "Telangana": [
-                "Hyderabad",
-                "Warangal",
-                "Nizamabad",
-                "Karimnagar",
-                "Khammam"
+                "Hyderabad", "Warangal", "Nizamabad",
+                "Karimnagar", "Khammam"
             ],
 
             "Tripura": [
-                "Agartala",
-                "Udaipur",
-                "Dharmanagar"
+                "Agartala", "Udaipur", "Dharmanagar"
             ],
 
             "Uttar Pradesh": [
-                "Lucknow",
-                "Kanpur",
-                "Agra",
-                "Varanasi",
-                "Prayagraj",
-                "Ghaziabad",
-                "Noida",
-                "Meerut",
-                "Gorakhpur",
-                "Bareilly"
+                "Lucknow", "Kanpur", "Agra", "Varanasi", "Prayagraj",
+                "Ghaziabad", "Noida", "Meerut", "Bareilly",
+                "Aligarh", "Moradabad", "Gorakhpur"
             ],
 
             "Uttarakhand": [
-                "Dehradun",
-                "Haridwar",
-                "Rishikesh",
-                "Nainital",
-                "Haldwani",
-                "Roorkee"
+                "Dehradun", "Haridwar", "Nainital",
+                "Haldwani", "Rishikesh", "Roorkee"
             ],
 
             "West Bengal": [
-                "Kolkata",
-                "Howrah",
-                "Durgapur",
-                "Siliguri",
-                "Asansol"
+                "Kolkata", "Howrah", "Durgapur",
+                "Asansol", "Siliguri", "Darjeeling"
             ],
 
             "Delhi": [
-                "New Delhi",
-                "Delhi"
+                "New Delhi", "Delhi"
             ],
 
             "Jammu and Kashmir": [
-                "Srinagar",
-                "Jammu",
-                "Anantnag",
-                "Baramulla"
+                "Srinagar", "Jammu", "Anantnag", "Baramulla"
             ],
 
             "Ladakh": [
-                "Leh",
-                "Kargil"
+                "Leh", "Kargil"
+            ],
+
+            "Puducherry": [
+                "Puducherry", "Karaikal"
+            ],
+
+            "Chandigarh": [
+                "Chandigarh"
             ]
         };
 
 
-        function validateCity() {
+        // ============================
+        // STATE CHANGE
+        // ============================
 
-            const state = stateInput.value;
-            const city = cityInput.value.trim();
-
-            if (!state || !city) {
-                cityValidation.textContent = "";
-                cityInput.setCustomValidity("");
-                return false;
-            }
-
-            const cities = stateCities[state] || [];
-
-            const valid = cities.some(
-                item => item.toLowerCase() === city.toLowerCase()
-            );
-
-            if (!valid) {
-
-                cityValidation.textContent =
-                    "❌ This city is not valid for the selected state.";
-
-                cityValidation.style.color = "#c62828";
-
-                cityInput.setCustomValidity(
-                    "Please enter a valid city for the selected state."
-                );
-
-                return false;
-            }
-
-            cityValidation.textContent = "✓ City verified";
-            cityValidation.style.color = "#16733d";
-
-            cityInput.setCustomValidity("");
-
-            return true;
-        }
-
-
-        /*
-         * State change
-         */
         stateInput.addEventListener("change", function () {
 
-            cityInput.value = "";
+            const state = stateInput.value;
 
-            cityValidation.textContent = "";
+            // Reset city
+            cityInput.innerHTML =
+                '<option value="">Select City</option>';
+
+            cityInput.value = "";
+            cityInput.disabled = true;
+
+            if (cityValidation) {
+                cityValidation.textContent = "";
+            }
 
             cityInput.setCustomValidity("");
 
-            cityInput.focus();
 
+            // No valid state
+            if (!state || !stateCities[state]) {
+                return;
+            }
+
+
+            // Add cities
+            stateCities[state].forEach(function (city) {
+
+                const option = document.createElement("option");
+
+                option.value = city;
+                option.textContent = city;
+
+                cityInput.appendChild(option);
+            });
+
+
+            // Enable city dropdown
+            cityInput.disabled = false;
         });
 
 
-        /*
-         * City typing
-         */
-        cityInput.addEventListener("input", function () {
-            validateCity();
+        // ============================
+        // CITY CHANGE
+        // ============================
+
+        cityInput.addEventListener("change", function () {
+
+            const state = stateInput.value;
+            const city = cityInput.value;
+
+            if (!state || !city) {
+
+                if (cityValidation) {
+                    cityValidation.textContent = "";
+                }
+
+                cityInput.setCustomValidity("");
+
+                return;
+            }
+
+
+            const validCities = stateCities[state] || [];
+
+            if (!validCities.includes(city)) {
+
+                if (cityValidation) {
+                    cityValidation.textContent =
+                        "❌ Invalid city for selected state.";
+
+                    cityValidation.style.color = "#c62828";
+                }
+
+                cityInput.setCustomValidity(
+                    "Please select a valid city for the selected state."
+                );
+
+                return;
+            }
+
+
+            if (cityValidation) {
+                cityValidation.textContent = "✓ City verified";
+                cityValidation.style.color = "#16733d";
+            }
+
+            cityInput.setCustomValidity("");
         });
 
 
-        /*
-         * Form submit
-         */
+        // ============================
+        // FORM SUBMIT
+        // ============================
+
         form.addEventListener("submit", function (event) {
 
-            if (!validateCity()) {
+            const state = stateInput.value;
+            const city = cityInput.value;
+
+            // Validate state
+            if (!state || !stateCities[state]) {
 
                 event.preventDefault();
+
+                stateInput.setCustomValidity(
+                    "Please select a valid state."
+                );
+
+                stateInput.reportValidity();
+
+                return;
+            }
+
+            stateInput.setCustomValidity("");
+
+
+            // Validate city
+            if (
+                !city ||
+                !stateCities[state] ||
+                !stateCities[state].includes(city)
+            ) {
+
+                event.preventDefault();
+
+                cityInput.setCustomValidity(
+                    "Please select a valid city for the selected state."
+                );
 
                 cityInput.reportValidity();
 
                 return;
             }
 
-            processing.style.display = "flex";
+            cityInput.setCustomValidity("");
 
-            button.disabled = true;
 
-            button.innerText = "Processing...";
+            // Processing screen
+            if (processing) {
+                processing.style.display = "flex";
+            }
 
+            if (button) {
+                button.disabled = true;
+                button.innerText = "Processing...";
+            }
         });
 
     });
