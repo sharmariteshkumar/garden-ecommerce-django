@@ -1170,6 +1170,22 @@ def cancel_order(request, order_id):
     # Cancel order
     order.status = "cancelled"
 
+    # Restore stock only if payment was already completed
+    if order.payment_status == "paid":
+
+        for item in order.items.select_related("product"):
+
+            if item.product:
+
+                item.product.stock += item.quantity
+
+                item.product.save(
+                    update_fields=[
+                        "stock",
+                        "updated_at",
+                    ]
+                )
+
     order.save(
         update_fields=["status"]
     )

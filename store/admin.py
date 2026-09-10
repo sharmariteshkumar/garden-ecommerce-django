@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django import forms
 from .email_service import send_customer_email
 
 from .models import (
@@ -29,6 +30,13 @@ class CategoryAdmin(admin.ModelAdmin):
         "name",
     )
 
+class StockRestoreForm(forms.Form):
+
+    restore_quantity = forms.IntegerField(
+        min_value=1,
+        label="Quantity to restore",
+        help_text="This quantity will be added to the current stock."
+    )
 
 # =========================================================
 # PRODUCT
@@ -36,6 +44,12 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    
+    action_form = StockRestoreForm
+
+    actions = [
+        "restore_stock",
+    ]
 
     list_display = (
         "id",
@@ -62,6 +76,64 @@ class ProductAdmin(admin.ModelAdmin):
         "slug": ("name",)
     }
 
+    def restore_stock(self, request, queryset):
+
+        quantity = request.POST.get("restore_quantity")
+
+        if not quantity:
+
+            self.message_user(
+                request,
+                "Please enter a quantity to restore.",
+                level="error"
+            )
+
+            return
+
+        try:
+            quantity = int(quantity)
+
+        except (TypeError, ValueError):
+
+            self.message_user(
+                request,
+                "Please enter a valid quantity.",
+                level="error"
+            )
+
+            return
+
+        if quantity < 1:
+
+            self.message_user(
+                request,
+                "Quantity must be at least 1.",
+                level="error"
+            )
+
+            return
+
+        updated = 0
+
+        for product in queryset:
+
+            product.stock += quantity
+
+            product.save(
+                update_fields=[
+                    "stock",
+                    "updated_at",
+                ]
+            )
+
+            updated += 1
+
+        self.message_user(
+            request,
+            f"Stock restored by {quantity} for {updated} product(s)."
+        )
+
+    restore_stock.short_description = "Restore stock"
 
 # =========================================================
 # ORDER ITEM INLINE
