@@ -579,17 +579,267 @@ def checkout(request):
                     "total": total,
                 }
             )
+        # =====================================================
+        # STATE + CITY VALIDATION
+        # =====================================================
 
-        # -------------------------
-# State + City validation
-# -------------------------
+        STATE_CITIES = {
 
-# Check whether selected state exists
+            "Andhra Pradesh": [
+                "Visakhapatnam",
+                "Vijayawada",
+                "Guntur",
+                "Nellore",
+                "Tirupati",
+                "Kurnool",
+            ],
+
+            "Arunachal Pradesh": [
+                "Itanagar",
+                "Naharlagun",
+                "Pasighat",
+                "Tawang",
+            ],
+
+            "Assam": [
+                "Guwahati",
+                "Dibrugarh",
+                "Jorhat",
+                "Silchar",
+                "Tezpur",
+            ],
+
+            "Bihar": [
+                "Patna",
+                "Gaya",
+                "Muzaffarpur",
+                "Bhagalpur",
+                "Darbhanga",
+            ],
+
+            "Chhattisgarh": [
+                "Raipur",
+                "Bhilai",
+                "Bilaspur",
+                "Korba",
+                "Durg",
+            ],
+
+            "Goa": [
+                "Panaji",
+                "Margao",
+                "Vasco da Gama",
+                "Mapusa",
+            ],
+
+            "Gujarat": [
+                "Ahmedabad",
+                "Surat",
+                "Vadodara",
+                "Rajkot",
+                "Bhavnagar",
+                "Jamnagar",
+            ],
+
+            "Haryana": [
+                "Gurugram",
+                "Faridabad",
+                "Panipat",
+                "Ambala",
+                "Hisar",
+                "Karnal",
+            ],
+
+            "Himachal Pradesh": [
+                "Shimla",
+                "Manali",
+                "Dharamshala",
+                "Solan",
+                "Mandi",
+            ],
+
+            "Jharkhand": [
+                "Ranchi",
+                "Jamshedpur",
+                "Dhanbad",
+                "Bokaro",
+                "Deoghar",
+            ],
+
+            "Karnataka": [
+                "Bengaluru",
+                "Mysuru",
+                "Mangaluru",
+                "Hubballi",
+                "Belagavi",
+                "Dharwad",
+            ],
+
+            "Kerala": [
+                "Thiruvananthapuram",
+                "Kochi",
+                "Kozhikode",
+                "Thrissur",
+                "Kollam",
+                "Kannur",
+            ],
+
+            "Madhya Pradesh": [
+                "Bhopal",
+                "Indore",
+                "Gwalior",
+                "Jabalpur",
+                "Ujjain",
+                "Sagar",
+            ],
+
+            "Maharashtra": [
+                "Mumbai",
+                "Pune",
+                "Nagpur",
+                "Nashik",
+                "Thane",
+                "Aurangabad",
+                "Kolhapur",
+            ],
+
+            "Manipur": [
+                "Imphal",
+                "Thoubal",
+                "Bishnupur",
+            ],
+
+            "Meghalaya": [
+                "Shillong",
+                "Tura",
+                "Jowai",
+            ],
+
+            "Mizoram": [
+                "Aizawl",
+                "Lunglei",
+                "Champhai",
+            ],
+
+            "Nagaland": [
+                "Kohima",
+                "Dimapur",
+                "Mokokchung",
+            ],
+
+            "Odisha": [
+                "Bhubaneswar",
+                "Cuttack",
+                "Rourkela",
+                "Puri",
+                "Berhampur",
+                "Sambalpur",
+            ],
+
+            "Punjab": [
+                "Amritsar",
+                "Ludhiana",
+                "Jalandhar",
+                "Patiala",
+                "Bathinda",
+            ],
+
+            "Rajasthan": [
+                "Jaipur",
+                "Jodhpur",
+                "Udaipur",
+                "Kota",
+                "Ajmer",
+                "Bikaner",
+            ],
+
+            "Sikkim": [
+                "Gangtok",
+                "Namchi",
+                "Gyalshing",
+            ],
+
+            "Tamil Nadu": [
+                "Chennai",
+                "Coimbatore",
+                "Madurai",
+                "Salem",
+                "Tiruchirappalli",
+                "Tirunelveli",
+                "Vellore",
+            ],
+
+            "Telangana": [
+                "Hyderabad",
+                "Warangal",
+                "Nizamabad",
+                "Karimnagar",
+                "Khammam",
+            ],
+
+            "Tripura": [
+                "Agartala",
+                "Udaipur",
+                "Dharmanagar",
+            ],
+
+            "Uttar Pradesh": [
+                "Lucknow",
+                "Kanpur",
+                "Agra",
+                "Varanasi",
+                "Prayagraj",
+                "Ghaziabad",
+                "Noida",
+                "Meerut",
+                "Gorakhpur",
+                "Bareilly",
+            ],
+
+            "Uttarakhand": [
+                "Dehradun",
+                "Haridwar",
+                "Rishikesh",
+                "Nainital",
+                "Haldwani",
+                "Roorkee",
+            ],
+
+            "West Bengal": [
+                "Kolkata",
+                "Howrah",
+                "Durgapur",
+                "Siliguri",
+                "Asansol",
+            ],
+
+            "Delhi": [
+                "New Delhi",
+                "Delhi",
+            ],
+
+            "Jammu and Kashmir": [
+                "Srinagar",
+                "Jammu",
+                "Anantnag",
+                "Baramulla",
+            ],
+
+            "Ladakh": [
+                "Leh",
+                "Kargil",
+            ],
+        }
+
+
+        # State must be from our list
         if state not in STATE_CITIES:
+
             messages.error(
                 request,
                 "Please select a valid state."
             )
+
             return render(
                 request,
                 "store/checkout.html",
@@ -599,14 +849,15 @@ def checkout(request):
                 }
             )
 
-# Check whether city belongs to selected state
-        valid_cities = STATE_CITIES[state]
 
-        if not any(city.lower() == valid_city.lower() for valid_city in valid_cities):
+        # City must belong to selected state
+        if city not in STATE_CITIES[state]:
+
             messages.error(
                 request,
-                f"{city} is not a valid city for {state}."
+                "Please select a valid city for the selected state."
             )
+
             return render(
                 request,
                 "store/checkout.html",
