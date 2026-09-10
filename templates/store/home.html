@@ -1659,7 +1659,7 @@
                         </h2>
                     </div>
 
-                    {% if products|length > 6 %}
+                    {% if products|length > 8 %}
                     <!-- Updated Green Themed Button -->
                     <a href="{% url 'all_products' %}" class="btn btn-outline-success rounded-3 fw-bold px-3 py-2">
                         View All Products <i class="bi bi-arrow-right ms-1"></i>
@@ -1678,7 +1678,7 @@
                 {% for product in products %}
 
                 <div
-                    class="product-grid-item product-card-wrapper {% if forloop.counter > 6 %}d-none extra-product{% endif %}">
+                    class="product-grid-item product-card-wrapper {% if forloop.counter > 8 %}d-none extra-product{% endif %}">
 
                     <div class="product-card">
 
