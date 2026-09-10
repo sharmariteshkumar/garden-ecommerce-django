@@ -1,4 +1,5 @@
 import os
+import re
 from decimal import Decimal
 
 import razorpay
@@ -372,6 +373,40 @@ def checkout(request):
         ).strip()
 
         pin_code = request.POST.get("pincode", "").strip()
+        
+                # -------------------------
+        # City & State validation
+        # -------------------------
+
+        if not re.fullmatch(r"[A-Za-zÀ-ÿ .'-]{2,100}", city):
+            messages.error(
+                request,
+                "Please enter a valid city name."
+            )
+
+            return render(
+                request,
+                "store/checkout.html",
+                {
+                    "cart_items": cart_items,
+                    "total": total,
+                }
+            )
+
+        if not re.fullmatch(r"[A-Za-zÀ-ÿ .'-]{2,100}", state):
+            messages.error(
+                request,
+                "Please enter a valid state name."
+            )
+
+            return render(
+                request,
+                "store/checkout.html",
+                {
+                    "cart_items": cart_items,
+                    "total": total,
+                }
+            )
 
         # -------------------------
         # Required fields
