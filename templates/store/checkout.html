@@ -187,6 +187,61 @@
         display: none !important;
     }
 
+    /* =========================
+   CHECKOUT PROCESSING
+========================= */
+
+    .checkout-processing {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        background: rgba(255, 255, 255, 0.96);
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .processing-box {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 35px 30px;
+        max-width: 380px;
+        width: 100%;
+        box-shadow: 0 15px 50px rgba(25, 61, 41, 0.15);
+        border: 1px solid #e5ebe5;
+    }
+
+    .processing-spinner {
+        width: 48px;
+        height: 48px;
+        margin: 0 auto 20px;
+        border: 4px solid #dce8df;
+        border-top-color: #16733d;
+        border-radius: 50%;
+        animation: checkoutSpin 0.8s linear infinite;
+    }
+
+    .processing-box h2 {
+        color: #173d29;
+        margin: 0 0 10px;
+        font-size: 23px;
+    }
+
+    .processing-box p {
+        color: #718078;
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    @keyframes checkoutSpin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
     @media (max-width: 800px) {
         .checkout-grid {
             grid-template-columns: 1fr;
@@ -281,7 +336,7 @@
 
                     </div>
 
-                    <button type="submit" class="place-order-btn">
+                    <button type="submit" class="place-order-btn" id="placeOrderBtn">
                         Place Order
                     </button>
 
@@ -333,7 +388,43 @@
         </div>
 
     </div>
+    <!-- CHECKOUT PROCESSING -->
+    <div class="checkout-processing" id="checkoutProcessing">
+        <div class="processing-box">
+            <div class="processing-spinner"></div>
+
+            <h2>Processing your order...</h2>
+
+            <p>
+                Please wait while we prepare your payment.
+                Do not refresh or close this page.
+            </p>
+        </div>
+    </div>
 
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const form = document.querySelector(".checkout-card form");
+        const button = document.getElementById("placeOrderBtn");
+        const processing = document.getElementById("checkoutProcessing");
+
+        if (form && button && processing) {
+
+            form.addEventListener("submit", function () {
+
+                processing.style.display = "flex";
+
+                button.disabled = true;
+                button.innerText = "Processing...";
+
+            });
+
+        }
+
+    });
+</script>
 
 {% endblock %}
