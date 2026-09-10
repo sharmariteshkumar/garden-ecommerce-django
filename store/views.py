@@ -1,5 +1,6 @@
 import os
 import re
+from django.core.validators import validate_email
 from decimal import Decimal
 
 import razorpay
@@ -374,16 +375,17 @@ def checkout(request):
 
         pin_code = request.POST.get("pincode", "").strip()
         
-                # -------------------------
-        # City & State validation
+
+        # -------------------------
+        # Professional field validation
         # -------------------------
 
-        if not re.fullmatch(r"[A-Za-zÀ-ÿ .'-]{2,100}", city):
+        # Name: letters, spaces, dot, apostrophe, hyphen only
+        if not re.fullmatch(r"[A-Za-zÀ-ÿ .'-]{2,100}", full_name):
             messages.error(
                 request,
-                "Please enter a valid city name."
+                "Please enter a valid full name."
             )
-
             return render(
                 request,
                 "store/checkout.html",
@@ -393,12 +395,72 @@ def checkout(request):
                 }
             )
 
+        # Phone: Indian 10 digit mobile number
+        if not re.fullmatch(r"[6-9][0-9]{9}", phone):
+            messages.error(
+                request,
+                "Please enter a valid 10-digit Indian mobile number."
+            )
+            return render(
+                request,
+                "store/checkout.html",
+                {
+                    "cart_items": cart_items,
+                    "total": total,
+                }
+            )
+
+        # PIN Code: exactly 6 digits and cannot start with 0
+        if not re.fullmatch(r"[1-9][0-9]{5}", pin_code):
+            messages.error(
+                request,
+                "Please enter a valid 6-digit PIN code."
+            )
+            return render(
+                request,
+                "store/checkout.html",
+                {
+                    "cart_items": cart_items,
+                    "total": total,
+                }
+            )
+
+        # City: letters, spaces and common punctuation only
+        if not re.fullmatch(r"[A-Za-zÀ-ÿ .'-]{2,100}", city):
+            messages.error(
+                request,
+                "Please enter a valid city name."
+            )
+            return render(
+                request,
+                "store/checkout.html",
+                {
+                    "cart_items": cart_items,
+                    "total": total,
+                }
+            )
+
+        # State: letters, spaces and common punctuation only
         if not re.fullmatch(r"[A-Za-zÀ-ÿ .'-]{2,100}", state):
             messages.error(
                 request,
                 "Please enter a valid state name."
             )
+            return render(
+                request,
+                "store/checkout.html",
+                {
+                    "cart_items": cart_items,
+                    "total": total,
+                }
+            )
 
+        # Address: minimum 10 characters
+        if len(address) < 10 or len(address) > 500:
+            messages.error(
+                request,
+                "Please enter a valid complete address."
+            )
             return render(
                 request,
                 "store/checkout.html",
