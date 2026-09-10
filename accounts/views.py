@@ -10,6 +10,7 @@ from django.contrib.auth.views import (
 )
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
+
 from .forms import RegisterForm, LoginForm
 
 
@@ -17,6 +18,7 @@ class UserLoginView(LoginView):
     template_name = "store/login.html"
     authentication_form = LoginForm
     redirect_authenticated_user = True
+    next_page = reverse_lazy("home")
 
     def form_valid(self, form):
         messages.success(
@@ -45,7 +47,7 @@ class RegisterView(CreateView):
 
         messages.success(
             self.request,
-            "Account created successfully."
+            "Account created successfully!"
         )
 
         return response

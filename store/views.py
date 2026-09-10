@@ -13,6 +13,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
+from django.contrib.auth.decorators import login_required
+
 from .models import Product, Category, Order, OrderItem
 
 
@@ -850,5 +852,26 @@ def payment_failed(request):
         "store/payment_failed.html",
         {
             "reason": reason
+        }
+    )
+
+# =========================================================
+# MY ORDERS
+# =========================================================
+
+@login_required
+def my_orders(request):
+
+    orders = Order.objects.filter(
+        customer_email=request.user.email
+    ).prefetch_related(
+        "items"
+    ).order_by("-created_at")
+
+    return render(
+        request,
+        "store/my_orders.html",
+        {
+            "orders": orders,
         }
     )
