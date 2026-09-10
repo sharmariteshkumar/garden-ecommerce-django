@@ -55,7 +55,8 @@ class RegisterView(CreateView):
 
 class UserPasswordResetView(PasswordResetView):
     template_name = "store/password_reset.html"
-    email_template_name = "store/password_reset_email.html"
+    email_template_name = "store/password_reset_email.txt"
+    html_email_template_name = "store/password_reset_email.html"
     subject_template_name = "store/password_reset_subject.txt"
     success_url = reverse_lazy("password_reset_done")
 

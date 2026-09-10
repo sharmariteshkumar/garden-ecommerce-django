@@ -166,19 +166,14 @@ BREVO_SENDER_NAME = os.environ.get(
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-
-EMAIL_HOST = "smtp-relay.brevo.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-
-EMAIL_HOST_USER = os.environ.get("BREVO_SMTP_USER")
-EMAIL_HOST_PASSWORD = os.environ.get("BREVO_SMTP_PASSWORD")
-
-EMAIL_TIMEOUT = 20
-
-DEFAULT_FROM_EMAIL = os.environ.get(
-    "BREVO_SENDER_EMAIL"
+# Brevo Transactional Email
+BREVO_API_KEY = os.environ.get("BREVO_API_KEY")
+BREVO_SENDER_EMAIL = os.environ.get("BREVO_SENDER_EMAIL")
+BREVO_SENDER_NAME = os.environ.get(
+    "BREVO_SENDER_NAME",
+    "ShopEasy Garden"
 )
 
-SERVER_EMAIL = DEFAULT_FROM_EMAIL
+EMAIL_BACKEND = "accounts.email_backend.BrevoEmailBackend"
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
