@@ -330,7 +330,7 @@ def all_products(request):
 # =========================================================
 # CHECKOUT
 # =========================================================
-
+@login_required(login_url="login")
 def checkout(request):
 
     cart_items, total = get_cart_items(request)
