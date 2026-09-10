@@ -349,10 +349,7 @@ def checkout(request):
             ""
         ).strip()
 
-        email = request.POST.get(
-            "email",
-            ""
-        ).strip()
+        email = request.user.email.strip()
 
         phone = request.POST.get(
             "phone",
