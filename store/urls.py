@@ -21,4 +21,5 @@ urlpatterns = [
     path("order-success/<int:order_id>/",views.order_success,name="order_success"),
     path("payment-failed/",views.payment_failed,name="payment_failed"),
     path("my-orders/", views.my_orders, name="my_orders"),
+    path("profile/", views.profile, name="profile"),
 ]
