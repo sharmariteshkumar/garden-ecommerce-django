@@ -20,6 +20,161 @@ from django.shortcuts import render
 
 from .models import Product, Category, Order, OrderItem
 
+# =========================================================
+# INDIA STATE -> CITY VALIDATION
+# =========================================================
+
+STATE_CITIES = {
+    "Andhra Pradesh": [
+        "Visakhapatnam", "Vijayawada", "Guntur", "Nellore", "Kurnool",
+        "Tirupati", "Rajahmundry", "Kakinada"
+    ],
+
+    "Arunachal Pradesh": [
+        "Itanagar", "Naharlagun", "Pasighat", "Tawang"
+    ],
+
+    "Assam": [
+        "Guwahati", "Dibrugarh", "Silchar", "Jorhat", "Tezpur"
+    ],
+
+    "Bihar": [
+        "Patna", "Gaya", "Bhagalpur", "Muzaffarpur", "Darbhanga"
+    ],
+
+    "Chhattisgarh": [
+        "Raipur", "Bhilai", "Bilaspur", "Korba", "Durg"
+    ],
+
+    "Goa": [
+        "Panaji", "Margao", "Vasco da Gama", "Mapusa"
+    ],
+
+    "Gujarat": [
+        "Ahmedabad", "Surat", "Vadodara", "Rajkot", "Bhavnagar",
+        "Jamnagar", "Gandhinagar", "Junagadh"
+    ],
+
+    "Haryana": [
+        "Gurugram", "Faridabad", "Panipat", "Ambala", "Hisar",
+        "Rohtak", "Karnal"
+    ],
+
+    "Himachal Pradesh": [
+        "Shimla", "Dharamshala", "Mandi", "Solan", "Kullu"
+    ],
+
+    "Jharkhand": [
+        "Ranchi", "Jamshedpur", "Dhanbad", "Bokaro", "Deoghar"
+    ],
+
+    "Karnataka": [
+        "Bengaluru", "Mysuru", "Mangaluru", "Hubballi", "Belagavi",
+        "Davanagere", "Ballari", "Shivamogga"
+    ],
+
+    "Kerala": [
+        "Thiruvananthapuram", "Kochi", "Kozhikode", "Thrissur",
+        "Kollam", "Kannur", "Alappuzha"
+    ],
+
+    "Madhya Pradesh": [
+        "Bhopal", "Indore", "Jabalpur", "Gwalior", "Ujjain",
+        "Sagar", "Rewa"
+    ],
+
+    "Maharashtra": [
+        "Mumbai", "Pune", "Nagpur", "Nashik", "Thane",
+        "Aurangabad", "Navi Mumbai", "Kolhapur", "Solapur",
+        "Amravati", "Satara", "Sangli", "Jalgaon", "Akola"
+    ],
+
+    "Manipur": [
+        "Imphal", "Thoubal", "Bishnupur"
+    ],
+
+    "Meghalaya": [
+        "Shillong", "Tura", "Jowai"
+    ],
+
+    "Mizoram": [
+        "Aizawl", "Lunglei", "Champhai"
+    ],
+
+    "Nagaland": [
+        "Kohima", "Dimapur", "Mokokchung"
+    ],
+
+    "Odisha": [
+        "Bhubaneswar", "Cuttack", "Rourkela", "Puri", "Berhampur",
+        "Sambalpur"
+    ],
+
+    "Punjab": [
+        "Ludhiana", "Amritsar", "Jalandhar", "Patiala", "Bathinda",
+        "Mohali", "Pathankot"
+    ],
+
+    "Rajasthan": [
+        "Jaipur", "Jodhpur", "Udaipur", "Kota", "Ajmer",
+        "Bikaner", "Alwar", "Bharatpur"
+    ],
+
+    "Sikkim": [
+        "Gangtok", "Namchi", "Gyalshing"
+    ],
+
+    "Tamil Nadu": [
+        "Chennai", "Coimbatore", "Madurai", "Tiruchirappalli",
+        "Salem", "Tirunelveli", "Vellore", "Erode", "Thoothukudi"
+    ],
+
+    "Telangana": [
+        "Hyderabad", "Warangal", "Nizamabad", "Karimnagar",
+        "Khammam"
+    ],
+
+    "Tripura": [
+        "Agartala", "Udaipur", "Dharmanagar"
+    ],
+
+    "Uttar Pradesh": [
+        "Lucknow", "Kanpur", "Agra", "Varanasi", "Prayagraj",
+        "Ghaziabad", "Noida", "Meerut", "Bareilly", "Aligarh",
+        "Moradabad", "Gorakhpur"
+    ],
+
+    "Uttarakhand": [
+        "Dehradun", "Haridwar", "Nainital", "Haldwani",
+        "Rishikesh", "Roorkee"
+    ],
+
+    "West Bengal": [
+        "Kolkata", "Howrah", "Durgapur", "Asansol", "Siliguri",
+        "Darjeeling"
+    ],
+
+    "Delhi": [
+        "New Delhi", "Delhi"
+    ],
+
+    "Jammu and Kashmir": [
+        "Srinagar", "Jammu", "Anantnag", "Baramulla"
+    ],
+
+    "Ladakh": [
+        "Leh", "Kargil"
+    ],
+
+    "Puducherry": [
+        "Puducherry", "Karaikal"
+    ],
+
+    "Chandigarh": [
+        "Chandigarh"
+    ]
+}
+
 
 # =========================================================
 # RAZORPAY CLIENT
@@ -425,11 +580,15 @@ def checkout(request):
                 }
             )
 
-        # City: letters, spaces and common punctuation only
-        if not re.fullmatch(r"[A-Za-zÀ-ÿ .'-]{2,100}", city):
+        # -------------------------
+# State + City validation
+# -------------------------
+
+# Check whether selected state exists
+        if state not in STATE_CITIES:
             messages.error(
                 request,
-                "Please enter a valid city name."
+                "Please select a valid state."
             )
             return render(
                 request,
@@ -440,11 +599,13 @@ def checkout(request):
                 }
             )
 
-        # State: letters, spaces and common punctuation only
-        if not re.fullmatch(r"[A-Za-zÀ-ÿ .'-]{2,100}", state):
+# Check whether city belongs to selected state
+        valid_cities = STATE_CITIES[state]
+
+        if not any(city.lower() == valid_city.lower() for valid_city in valid_cities):
             messages.error(
                 request,
-                "Please enter a valid state name."
+                f"{city} is not a valid city for {state}."
             )
             return render(
                 request,
