@@ -740,6 +740,22 @@
 
         });
 
+                window.addEventListener("pageshow", function () {
+
+            const button = document.getElementById("proceedCheckoutBtn");
+
+            if (!button) return;
+
+            button.classList.remove("processing");
+
+            const text = button.querySelector(".btn-text");
+
+            if (text) {
+                text.textContent = "Proceed to Checkout";
+            }
+
+        });
+
     </script>
 
 </body>

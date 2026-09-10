@@ -1174,6 +1174,137 @@ def cancel_order(request, order_id):
         update_fields=["status"]
     )
 
+    # =====================================================
+    # CANCELLATION EMAIL
+    # =====================================================
+
+    items_text = "\n".join(
+        [
+            f"- {item.product_name} x {item.quantity} = ₹{item.total}"
+            for item in order.items.all()
+        ]
+    )
+
+    customer_subject = (
+        f"ShopEasy Garden - Order {order.order_number} Cancelled"
+    )
+
+    customer_message = f"""Hello {order.customer_name},
+
+Your ShopEasy Garden order has been cancelled successfully.
+
+Order Number: {order.order_number}
+Order Status: CANCELLED
+Payment Status: {order.payment_status.upper()}
+Total Amount: ₹{order.total_amount}
+
+Items:
+{items_text}
+
+Delivery Address:
+{order.address}, {order.city}, {order.state} - {order.pincode}
+
+If you did not request this cancellation, please contact us.
+
+Thank you,
+ShopEasy Garden
+"""
+
+    try:
+
+        sent = send_customer_email(
+            to_email=order.customer_email,
+            subject=customer_subject,
+            message=customer_message,
+        )
+
+        if sent:
+            print(
+                f"CANCELLATION EMAIL SENT: "
+                f"{order.customer_email}"
+            )
+        else:
+            print(
+                f"CANCELLATION EMAIL FAILED: "
+                f"{order.customer_email}"
+            )
+
+    except Exception as e:
+
+        print(
+            "CANCELLATION EMAIL ERROR:",
+            repr(e)
+        )
+
+    # =====================================================
+    # ADMIN CANCELLATION EMAIL
+    # =====================================================
+
+    admin_email = os.environ.get("ADMIN_EMAIL")
+
+    if admin_email:
+
+        admin_subject = (
+            f"ShopEasy Garden - Order {order.order_number} Cancelled"
+        )
+
+        admin_message = f"""Order cancellation notification.
+
+Order Number:
+{order.order_number}
+
+Customer:
+{order.customer_name}
+
+Email:
+{order.customer_email}
+
+Phone:
+{order.customer_phone}
+
+Amount:
+₹{order.total_amount}
+
+Payment Status:
+{order.payment_status.upper()}
+
+Order Status:
+CANCELLED
+
+Items:
+{items_text}
+
+Address:
+{order.address}
+{order.city}, {order.state} - {order.pincode}
+"""
+
+        try:
+
+            sent = send_customer_email(
+                to_email=admin_email,
+                subject=admin_subject,
+                message=admin_message,
+            )
+
+            if sent:
+                print(
+                    f"ADMIN CANCELLATION EMAIL SENT: "
+                    f"{admin_email}"
+                )
+            else:
+                print(
+                    f"ADMIN CANCELLATION EMAIL FAILED: "
+                    f"{admin_email}"
+                )
+
+        except Exception as e:
+
+            print(
+                "ADMIN CANCELLATION EMAIL ERROR:",
+                repr(e)
+            )
+
     messages.success(
         request,
         f"Order {order.order_number} has been cancelled successfully."
