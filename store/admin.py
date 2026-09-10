@@ -49,6 +49,7 @@ class ProductAdmin(admin.ModelAdmin):
     action_form = StockRestoreForm
 
     actions = [
+        "delete_selected",
         "restore_stock",
     ]
 
