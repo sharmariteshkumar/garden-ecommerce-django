@@ -4,55 +4,117 @@
 
 <div class="auth-container">
 
-    <div class="auth-card">
+```
+<div class="auth-card">
 
-        <h2>Create Account</h2>
+    <h2>Create Account</h2>
 
-        <form method="post">
-            {% csrf_token %}
+    <form method="post" id="registerForm">
+        {% csrf_token %}
 
-            {{ form.non_field_errors }}
+        {{ form.non_field_errors }}
 
-            {% for field in form %}
+        {% for field in form %}
 
-            <div class="form-group">
+        <div class="form-group">
 
-                <label for="{{ field.id_for_label }}">
-                    {{ field.label }}
-                </label>
+            <label for="{{ field.id_for_label }}">
+                {{ field.label }}
+            </label>
 
-                {{ field }}
+            {{ field }}
 
-                {% if field.help_text %}
-                <small>
-                    {{ field.help_text }}
-                </small>
-                {% endif %}
+            {% if field.help_text %}
+            <small>
+                {{ field.help_text }}
+            </small>
+            {% endif %}
 
-                {{ field.errors }}
-
-            </div>
-
-            {% endfor %}
-
-            <button type="submit" id="registerBtn">
-                <span class="btn-text">Create Account</span>
-            </button>
-
-        </form>
-
-        <div class="auth-links">
-
-            <span>Already have an account?</span>
-
-            <a href="{% url 'login' %}">
-                Login
-            </a>
+            {{ field.errors }}
 
         </div>
+
+        {% endfor %}
+
+        <button type="submit" id="registerBtn">
+            <span class="btn-text">Create Account</span>
+            <span class="btn-spinner"></span>
+        </button>
+
+    </form>
+
+    <div class="auth-links">
+
+        <span>Already have an account?</span>
+
+        <a href="{% url 'login' %}">
+            Login
+        </a>
 
     </div>
 
 </div>
+```
+
+</div>
+
+<style>
+    .btn-spinner {
+        display: none;
+        width: 16px;
+        height: 16px;
+        margin-left: 8px;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        border-top-color: #ffffff;
+        border-radius: 50%;
+        animation: authSpin 0.7s linear infinite;
+        vertical-align: middle;
+    }
+
+    #registerBtn.processing .btn-spinner {
+        display: inline-block;
+    }
+
+    #registerBtn.processing .btn-text {
+        opacity: 0.9;
+    }
+
+    @keyframes authSpin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const form = document.getElementById("registerForm");
+        const button = document.getElementById("registerBtn");
+
+        form.addEventListener("submit", function (event) {
+
+            /*
+             * Browser validation pehle hone do.
+             * Agar koi field invalid hai,
+             * spinner nahi chalega.
+             */
+            if (!form.checkValidity()) {
+                return;
+            }
+
+            /*
+             * Processing state
+             */
+            button.classList.add("processing");
+            button.disabled = true;
+
+            button.querySelector(".btn-text").textContent =
+                "Processing...";
+
+        });
+
+    });
+</script>
 
 {% endblock %}
