@@ -7,14 +7,7 @@
     <h2>My Profile</h2>
 
     <div class="card mt-4 p-4">
-        <p>
-            <strong>Name:</strong>
-            {% if user.first_name %}
-            {{ user.first_name|title }}
-            {% else %}
-            {{ user.username|title }}
-            {% endif %}
-        </p>
+        <p><strong>Name:</strong> {{ user.first_name|default:user.username|title }}</p>
         <p><strong>Email:</strong> {{ user.email }}</p>
 
         <hr>
