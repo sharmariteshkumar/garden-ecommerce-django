@@ -166,7 +166,6 @@ BREVO_SENDER_NAME = os.environ.get(
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
-# Email - Brevo SMTP
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 EMAIL_HOST = "smtp-relay.brevo.com"
@@ -174,11 +173,12 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 EMAIL_HOST_USER = os.environ.get("BREVO_SMTP_USER")
-EMAIL_HOST_PASSWORD = os.environ.get("BREVO_SMTP_KEY")
+EMAIL_HOST_PASSWORD = os.environ.get("BREVO_SMTP_PASSWORD")
+
+EMAIL_TIMEOUT = 20
 
 DEFAULT_FROM_EMAIL = os.environ.get(
-    "BREVO_SENDER_EMAIL",
-    "your-verified-email@example.com"
+    "BREVO_SENDER_EMAIL"
 )
 
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
