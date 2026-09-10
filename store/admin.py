@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.admin.helpers import ActionForm
 from django import forms
 from .email_service import send_customer_email
 
@@ -30,14 +31,14 @@ class CategoryAdmin(admin.ModelAdmin):
         "name",
     )
 
-class StockRestoreForm(forms.Form):
+class StockRestoreForm(ActionForm):
 
     restore_quantity = forms.IntegerField(
         min_value=1,
         label="Quantity to restore",
         help_text="This quantity will be added to the current stock."
     )
-
+    
 # =========================================================
 # PRODUCT
 # =========================================================
