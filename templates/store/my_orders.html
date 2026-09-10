@@ -57,6 +57,21 @@
                         {{ order.get_status_display }}
                     </span>
 
+                    {% if order.status == "pending" or order.status == "confirmed" or order.status == "processing" %}
+
+                    <form method="post" action="{% url 'cancel_order' order.id %}" class="mt-2"
+                        onsubmit="return confirm('Are you sure you want to cancel this order?');">
+
+                        {% csrf_token %}
+
+                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                            Cancel Order
+                        </button>
+
+                    </form>
+
+                    {% endif %}
+
                 </div>
 
             </div>

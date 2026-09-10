@@ -316,6 +316,31 @@
             color: #c0392b;
             font-size: 0.82rem;
         }
+
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        .btn-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            vertical-align: -3px;
+            border: 2px solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: btnSpin 0.7s linear infinite;
+        }
+
+        @keyframes btnSpin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
     </style>
 </head>
 

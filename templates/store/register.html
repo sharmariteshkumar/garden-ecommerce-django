@@ -15,28 +15,28 @@
 
             {% for field in form %}
 
-                <div class="form-group">
+            <div class="form-group">
 
-                    <label for="{{ field.id_for_label }}">
-                        {{ field.label }}
-                    </label>
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
 
-                    {{ field }}
+                {{ field }}
 
-                    {% if field.help_text %}
-                        <small>
-                            {{ field.help_text }}
-                        </small>
-                    {% endif %}
+                {% if field.help_text %}
+                <small>
+                    {{ field.help_text }}
+                </small>
+                {% endif %}
 
-                    {{ field.errors }}
+                {{ field.errors }}
 
-                </div>
+            </div>
 
             {% endfor %}
 
-            <button type="submit">
-                Create Account
+            <button type="submit" id="registerBtn">
+                <span class="btn-text">Create Account</span>
             </button>
 
         </form>
