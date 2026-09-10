@@ -859,14 +859,18 @@ def payment_failed(request):
 # MY ORDERS
 # =========================================================
 
-@login_required
 def my_orders(request):
 
+    if not request.user.is_authenticated:
+        messages.info(
+            request,
+            "Please login to view your orders."
+        )
+        return redirect("login")
+
     orders = Order.objects.filter(
-        customer_email=request.user.email
-    ).prefetch_related(
-        "items"
-    ).order_by("-created_at")
+        customer_email__iexact=request.user.email
+    ).prefetch_related("items")
 
     return render(
         request,
